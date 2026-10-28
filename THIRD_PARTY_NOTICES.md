@@ -1,6 +1,8 @@
 # Third-party notices
 
-A newly branded derivative; these notices are required legal attribution.
+Gunner's TV Launcher includes open-source components. These notices preserve their required legal attribution. Product navigation, installation and support use Gunner's identity.
+
+Verbatim component notices are also stored in `legal/third-party/`. Source revisions are recorded in [legal/SOURCE-PROVENANCE.md](legal/SOURCE-PROVENANCE.md). No upstream launcher installation or account is required.
 
 Launcher components — 0xProbability
 

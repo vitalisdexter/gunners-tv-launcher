@@ -1,5 +1,7 @@
 # Local verification
 
+Documentation update: product/setup docs were expanded and component legal files organised under `legal/`. Markdown links, branding exceptions and unchanged runtime/build source were checked separately. The build results below apply to the executable source, which this documentation update does not change; no additional TV test is claimed.
+
 Fresh independent checkout of source commit `299c55c7d398d6f53c62bb2e981fbb6e8c7cc53b`. Java 17, Android SDK 34, wrapper 8.9, AGP 8.5.2. Commands: `testReleaseUnitTest lintRelease assembleRelease assembleDebug`. The verification machine used an ordinary warm dependency cache and an installed SDK outside the checkout; source does not depend on their paths. A new-machine online dependency download and hosted CI are not claimed.
 
 - **68 tests passed**, zero failures/errors.

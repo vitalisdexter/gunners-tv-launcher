@@ -1,4 +1,6 @@
-# Source provenance
+# Component source provenance
+
+This is a legal and historical record, not a product link or installation dependency. Gunner's builds from its own root and uses its own application identity. No upstream launcher, checkout or companion app is required to install it.
 
 Newly branded derivative of Luma revision `8ce68387cb690786445ffde8d1d1776d07fb6997`, with selected Talkies football refresh code from revision `d50b5afb481d5ac2d911d8d1777a9b3f3e7a0899`, a Gathin HOME helper, and substantial custom launcher functionality. This is not a wholesale merge or a from-scratch authorship claim. Input milestone: 2.4-personal.6 / 6.
 

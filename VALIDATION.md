@@ -2,13 +2,19 @@
 
 Documentation update: product/setup docs were expanded and component legal files organised under `legal/`. Markdown links, branding exceptions and unchanged runtime/build source were checked separately. The build results below apply to the executable source, which this documentation update does not change; no additional TV test is claimed.
 
-Fresh independent checkout of source commit `299c55c7d398d6f53c62bb2e981fbb6e8c7cc53b`. Java 17, Android SDK 34, wrapper 8.9, AGP 8.5.2. Commands: `testReleaseUnitTest lintRelease assembleRelease assembleDebug`. The verification machine used an ordinary warm dependency cache and an installed SDK outside the checkout; source does not depend on their paths. A new-machine online dependency download and hosted CI are not claimed.
+Fresh independent checkout of source commit `299c55c7d398d6f53c62bb2e981fbb6e8c7cc53b`. Java 17, Android SDK 34, wrapper 8.9, AGP 8.5.2. Commands: `testReleaseUnitTest lintRelease assembleRelease assembleDebug`. The local verification machine used an ordinary warm dependency cache and an installed SDK outside the checkout; source does not depend on their paths. Hosted verification is recorded separately below.
 
 - **68 tests passed**, zero failures/errors.
 - Lint: **0 errors**, **63 warnings**, 0 informational findings. No new blanket suppression. 
 - Debug QA and unsigned release APKs assembled; package, manifest components and signing state inspected with Android build tools. 
 - Source, Git index/history (118 unique blobs), filenames and assets checked for known private markers/credential patterns. Required licences are retained. Scans are bounded, not a guarantee against every possible secret format.
 - PowerShell scripts parse; mocked device script verified explicit targeting without executing ADB.
+
+## Hosted verification
+
+On 28 October 2026, [GitHub Actions run 40774656944](https://github.com/vitalisdexter/gunners-tv-launcher/actions/runs/40774656944) passed for commit `7f1d75a9a1d76b751086a130a5ff067c16df50be`, using a fresh Ubuntu 24.04 runner, Java 17 and SDK 34. SDK component setup and `testReleaseUnitTest lintRelease assembleRelease assembleDebug` all succeeded. This verifies the public checkout/build route, not TV behaviour or production signing. The workflow does not publish APK downloads.
+
+The first hosted runs stopped before compilation because the moving `ubuntu-latest` image lacked `sdkmanager`. The workflow now selects Ubuntu 24.04 and calls the installed SDK manager by its explicit path.
 
 ## Warning triage
 
@@ -18,4 +24,4 @@ UI text/RTL warnings reflect the existing English-first TV interface; drawing al
 
 ## Not tested here
 
-No emulator/system image was installed. No TV was contacted, no app installed, no settings changed. Physical remote/focus, actual rendered screens, reboot/default HOME behaviour, media access, live match transitions, provider playback/resume, Google Home, audio selection and phone casting still require a separately approved device test. Synthetic documentation images are not test evidence. No production signing or hosted CI run.
+No emulator/system image was installed. No TV was contacted, no app installed, no settings changed. Physical remote/focus, actual rendered screens, reboot/default HOME behaviour, media access, live match transitions, provider playback/resume, Google Home, audio selection and phone casting still require a separately approved device test. Synthetic documentation images are not test evidence. No production signing.

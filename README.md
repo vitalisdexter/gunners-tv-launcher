@@ -17,11 +17,11 @@ Version: **1.0.0 / 1**. Android package: `dev.gunnerstv.launcher`. Minimum Andro
 
 ## Install
 
-Follow [DEVICE-SETUP.md](DEVICE-SETUP.md), or copy [INSTALL-PROMPT.md](INSTALL-PROMPT.md) into a coding assistant with local terminal access. The prompt guides device identification, APK verification, installation, setup, recovery and checks.
+Follow [DEVICE-SETUP.md](DEVICE-SETUP.md), or copy the complete [installation prompt](https://github.com/vitalisdexter/gunners-tv-launcher/blob/main/INSTALL-PROMPT.md) into an AI assistant with local terminal access. The prompt starts from this public GitHub repository, detects Windows/macOS/Linux, collects your device and football preferences, builds a signed evaluation APK and guides installation, setup, recovery and checks.
 
 Supported targets are Android TV/Google TV devices running Android 8.0 or newer. Other Android boxes need their TV capabilities checked individually. This APK does not install directly on Samsung Tizen, LG webOS, Roku or Apple TV; those televisions can use a compatible external Android TV box. Fire TV and manufacturer-specific Home restrictions need separate compatibility checks.
 
-Use a signed APK from a source you trust or build a debug APK locally. No public repository/download URL is configured in this source tree. The release build is unsigned and requires separate signing before installation.
+Clone [vitalisdexter/gunners-tv-launcher](https://github.com/vitalisdexter/gunners-tv-launcher) and build a debug APK locally. Public cloning requires no GitHub login. No signed production APK release is currently published; check the actual [Releases page](https://github.com/vitalisdexter/gunners-tv-launcher/releases) before assuming one exists. The local release build is unsigned and requires separate signing before installation.
 
 ## Build independently
 
@@ -50,7 +50,7 @@ The proposed YouTube football News tab is not part of this version. Planned feat
 
 No private app databases, account passwords, playlist credentials or analytics are collected. See [PRIVACY.md](PRIVACY.md). Runtime club/provider logos are their owners’ marks, not a claim of endorsement. This project is not affiliated with Arsenal, any league, provider or TV manufacturer.
 
-Local verification and remaining physical checks are recorded in [VALIDATION.md](VALIDATION.md). A successful build is not proof of correct behaviour on every TV. Hosted CI has not run until this repository is published with approval.
+Local verification and remaining physical checks are recorded in [VALIDATION.md](VALIDATION.md). A successful build is not proof of correct behaviour on every TV. Current hosted build results are available in [GitHub Actions](https://github.com/vitalisdexter/gunners-tv-launcher/actions).
 
 ## Licence and contributions
 

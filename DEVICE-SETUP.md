@@ -2,6 +2,19 @@
 
 This guide installs `dev.gunnerstv.launcher`. For assistant-led setup, use [INSTALL-PROMPT.md](INSTALL-PROMPT.md). Choose the target device and APK deliberately; the build scripts never install automatically.
 
+## 0. Get the source from GitHub
+
+Public source: [vitalisdexter/gunners-tv-launcher](https://github.com/vitalisdexter/gunners-tv-launcher). From a new parent folder on Windows, macOS or Linux:
+
+```text
+git clone https://github.com/vitalisdexter/gunners-tv-launcher.git gunners-tv-launcher
+cd gunners-tv-launcher
+git remote get-url origin
+git rev-parse HEAD
+```
+
+No GitHub login/token is needed to clone the public repository. Record the commit and keep any later personal configuration changes private. Reuse an existing checkout only after inspecting its origin and local changes; do not overwrite them. If Git is unavailable, install it from its official source or obtain the source ZIP from this exact repository. The assistant prompt handles locating or installing the required build tools on each computer OS.
+
 ## 1. Check the target
 
 You need an Android TV or Google TV device with Android 8.0/API 26 or newer, a working remote, and access to system Settings. Manufacturer-specific Android boxes need their TV features checked. Tizen, webOS, Roku and Apple TV cannot run this APK directly. Fire TV support and Home replacement are not certified by this project.
@@ -12,14 +25,18 @@ Leave the existing launcher available. Record the current default Home in a priv
 
 Before choosing a prebuilt APK or building one, ask whether Arsenal should be the person's main club, which clubs they want fixtures for, and which players they want to follow (club matches, international matches or both). Allow no main club, no clubs or no players as preferences. See [CONFIGURATION.md](CONFIGURATION.md) for the current build-time options and fixed Arsenal fallback; explain unsupported preferences before proceeding. A prebuilt APK without a football editor cannot apply a different preset through this guide alone.
 
-Use a maintainer-provided signed APK from a verified source, checking its published SHA256 and signer when available. This source tree does not name a public release URL. Do not assume that a random search result is an official download.
+Build locally by default. There is currently no published signed production APK. If choosing a prebuilt later, check the actual [Releases page](https://github.com/vitalisdexter/gunners-tv-launcher/releases) and its published SHA256/signer, or use a trusted signed file supplied deliberately. Do not assume that a source ZIP, unsigned release build or random search result is an official installable APK.
 
 Alternatively, build locally with Java 17, Android SDK platform 34 and build-tools 34.0.0:
+
+Apply any supported followed-club/player resource changes before building. Find the actual tool installations and set `JAVA_HOME` and `ANDROID_HOME`; ensure `sdkmanager` and `adb` are available via their real paths. Install missing SDK packages with Google's command-line tools or Android Studio and accept their licences. `sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"` supplies the required SDK components. The first build also downloads public Gradle dependencies.
 
 ```powershell
 # Windows, from this repository's root
 .\Build.ps1
 ```
+
+If PowerShell script policy prevents `Build.ps1`, run `.\gradlew.bat --no-daemon --max-workers=2 testReleaseUnitTest lintRelease assembleRelease assembleDebug` directly rather than weakening machine policy.
 
 ```sh
 # Linux/macOS, from this repository's root
@@ -102,6 +119,8 @@ adb -s TARGET shell cmd package resolve-activity --brief -a android.intent.actio
 Check the active Android user before using `--user 0`; choose the actual user where appropriate. If the command is unavailable, use the device's Settings. A successful role command alone does not establish which Home activity the firmware will open.
 
 Some onn./Google TV firmware gives its protected stock Home activity higher priority. Gunner's has an optional helper for the exact stock Google TV Home window. If required, enable `dev.gunnerstv.launcher/.HomeRedirectService` manually in Accessibility and keep the redirect enabled in Gunner's Home settings. This helper does not read window contents or filter remote keys. Preserve unrelated accessibility services. It is not a universal workaround for other vendors' launchers.
+
+If replacing another custom launcher, check for an existing Home redirect first. When choosing Gunner's as Home, coordinate switching only the positively identified previous launcher's redirect/helper and retain its original state for recovery. Two redirectors can compete; do not enable both blindly or overwrite the full accessibility-service list. Leave unrelated services alone.
 
 Test the physical remote's Home button and a restart before calling the default change successful. If the firmware refuses, keep Gunner's as a manually launched app and report the limitation. Do not disable stock Home, setup, system services, casting, updates or apps to force replacement.
 

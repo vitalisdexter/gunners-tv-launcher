@@ -6,4 +6,6 @@ Draft release: Gunner's TV Launcher 1.0.0 — independently buildable public pre
 
 Debug builds use only a local QA identity. Release builds are unsigned. Production signing needs a separate owner-approved key held outside Git and a documented secure signing process. No key, password or signed production binary is published here. Source-only CI never accesses signing secrets.
 
-Local source/artifact hashes and checks are supplied separately for review. Remote repository creation, pushes, releases, installation and TV-setting changes require owner approval. No remote has been created. Repository name suggestion: `gunners-tv-launcher`. No fictitious username/domain/contact is configured.
+Public source: [vitalisdexter/gunners-tv-launcher](https://github.com/vitalisdexter/gunners-tv-launcher), branch `main`; `v1.0.0-preparation` records the original source-preparation milestone. Installation documentation may be newer than that tag. The reusable [installation prompt](INSTALL-PROMPT.md) builds the selected source revision for local evaluation.
+
+No signed production APK or GitHub Release is currently published. Check the actual [Releases page](https://github.com/vitalisdexter/gunners-tv-launcher/releases) before selecting a prebuilt download. Publishing a signed production APK requires an approved signing process; source publication alone does not authorise a TV installation or default-Home change. Local source/artifact hashes and checks were supplied separately for review.

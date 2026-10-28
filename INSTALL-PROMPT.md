@@ -15,6 +15,8 @@ MY DETAILS
 - Make Gunner's the default Home: ask me (do not change the default until answered)
 - Optional greeting name, weather city/coordinates and favourite apps: ask me only when needed
 - Enable Now Playing: ask me
+- Arsenal as my main club: ask me explicitly; do not assume yes
+- Clubs and players I want to follow for fixtures: ask me explicitly; an empty selection is allowed
 
 EXPECTED APP
 - Display name: Gunner's TV Launcher
@@ -37,6 +39,15 @@ Read README.md, DEVICE-SETUP.md and applicable local instructions when source is
 This is an Android TV/Google TV app. Check Android API 26+ and TV/Leanback capability. Do not assume Samsung Tizen, LG webOS, Roku, Apple TV, Fire TV or a generic Android box is compatible. Stop and explain unsupported targets without lowering the minimum SDK or changing the manifest.
 
 Identify the existing Home and record a private recovery route. If Gunner's is already installed, note its version and signing identity before updating. Keep any available trusted previous APK. Do not promise an APK copy can restore private settings or that Android will permit a downgrade.
+
+Before choosing or building the installation package, ask these football setup questions together, unless I have already answered them:
+1. "Would you like Arsenal to be your main club? If not, would you prefer another main club or no main club?"
+2. "Which clubs would you like to keep tabs on for football fixtures? You can choose several clubs, include or exclude Arsenal, or choose none."
+3. "Which players would you like to follow? Should their fixtures include club matches, international matches, or both? You can also choose no players."
+
+Use club/player names in the conversation, not numerical provider IDs. Clarify ambiguous names with country, league or full name, then summarise the selections for me. Do not automatically add the starter clubs or players if I have chosen a different list.
+
+Check those selections against the actual supplied version before promising they can be applied. The current source has build-time followed-club/player arrays, no on-TV football selection editor, and a fixed Arsenal upcoming-game fallback. Another main club or disabling that fallback is not currently configurable. Supported player mappings currently cover Cristiano Ronaldo and Kylian Mbappé with both club and international fixtures. Other players or a club-only/international-only player filter need additional implementation. If my choice needs one of these missing features, explain the specific gap and ask whether to proceed with the supported subset or defer football setup. Keep my full requested choices in private notes for later; do not silently substitute Arsenal, Ronaldo or Mbappé.
 
 2. PREPARE A VERIFIED, SIGNED APK
 If I supply a signed APK, check its source and available checksum. Inspect the application ID, version, minimum SDK and TV launch activity with Android build tools; verify the signature and record the public signer fingerprint. Do not treat a random download or a matching label as proof of authenticity.
@@ -74,6 +85,8 @@ On a signature mismatch, verification error, unsupported SDK, storage failure or
 5. CONFIGURE FEATURES
 Help me set my greeting name, weather city/coordinates, favourites and recommendation visibility in the available UI. Clear weather overrides if I prefer the TV time-zone city. Consult CONFIGURATION.md for build-time followed-team/player options; do not claim there is a team editor if the current version has none.
 
+Apply the football choices collected earlier using the controls actually supported by this version. If building from source, configure followed_club_ids and followed_player_ids in app/src/main/res/values/launcher_config.xml before the build, resolving club IDs against the football provider and using only implemented player mappings. A selected main club must also be included in the followed clubs. If using a prebuilt APK with no football editor, explain that its preset cannot be changed through the installation prompt; offer a source build for supported selections. Do not claim the fixed Arsenal fallback has changed just because a different club was added to the fixture list. Confirm the applied clubs/players separately from any requested choices that remain unsupported.
+
 Ask before enabling optional Now Playing notification access. Explain that Android grants broad notification access, while this implementation uses media sessions and does not process notification content. Let me grant special access in the TV UI. Request TV listings access only where offered and needed for shared provider rows. Do not grant blanket system or secure-settings permissions.
 
 Provider rows only show content that installed apps publish to Android TV. YouTube Continue Watching may be empty even when YouTube is signed in. Do not invent history, progress or recommendations, request account cookies or promise exact cross-device resume. Empty provider feeds are a feature-availability limitation, not necessarily an installation failure. Only claim a News tab exists if the actual installed version includes it.
@@ -95,7 +108,7 @@ Before ending, explain the recovery route for my firmware. For Google TV, Gunner
 
 When installation and recovery checks are complete, guide me to forget the paired computer, revoke debugging authorisations and turn off debugging enabled for this session. Disconnect the explicit ADB target afterwards. adb disconnect alone does not close the device's debugging service. Report anything I have not yet confirmed instead of claiming it is disabled.
 
-Finish with the installed app/package/version, APK hash and public signer fingerprint, how Home is handled, checks passed/failed/not tested, remaining limitations, recovery steps and debugging status. Do not expose private connection details in a public report.
+Finish with the installed app/package/version, APK hash and public signer fingerprint, how Home is handled, applied football clubs/players and main-club behaviour, any requested football choices not applied, checks passed/failed/not tested, remaining limitations, recovery steps and debugging status. Do not expose private connection details in a public report.
 ```
 
 For the manual commands and official references, see [DEVICE-SETUP.md](DEVICE-SETUP.md).

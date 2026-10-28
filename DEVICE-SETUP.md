@@ -10,6 +10,8 @@ Leave the existing launcher available. Record the current default Home in a priv
 
 ## 2. Choose a signed APK
 
+Before choosing a prebuilt APK or building one, ask whether Arsenal should be the person's main club, which clubs they want fixtures for, and which players they want to follow (club matches, international matches or both). Allow no main club, no clubs or no players as preferences. See [CONFIGURATION.md](CONFIGURATION.md) for the current build-time options and fixed Arsenal fallback; explain unsupported preferences before proceeding. A prebuilt APK without a football editor cannot apply a different preset through this guide alone.
+
 Use a maintainer-provided signed APK from a verified source, checking its published SHA256 and signer when available. This source tree does not name a public release URL. Do not assume that a random search result is an official download.
 
 Alternatively, build locally with Java 17, Android SDK platform 34 and build-tools 34.0.0:
@@ -82,7 +84,7 @@ Windows users with a network target can instead use the supplied wrapper:
 
 ## 5. Configure the launcher
 
-Set your name and weather location in launcher Settings, then arrange favourites by holding OK on an app. Choose visible recommendations in Settings. See [CONFIGURATION.md](CONFIGURATION.md) for supported followed-team/player defaults.
+Set your name and weather location in launcher Settings, then arrange favourites by holding OK on an app. Choose visible recommendations in Settings. Review the football choices collected before installation and distinguish what was applied from any unsupported preference. See [CONFIGURATION.md](CONFIGURATION.md) for supported followed-team/player defaults.
 
 Grant TV listings access only if offered and wanted for shared content. Now Playing uses optional notification access to media sessions; the implementation does not process notification content, although Android's permission is broad. If access is declined or unavailable, leave that feature inactive. Wi-Fi, audio output and Google Home shortcuts depend on the firmware's handlers. No streaming accounts or private playlists need to be entered into this launcher.
 

@@ -1,0 +1,23 @@
+name: Android verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v6
+      - name: SDK components
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+      - name: Verify and assemble unsigned release and debug QA
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --max-workers=2 testReleaseUnitTest lintRelease assembleRelease assembleDebug

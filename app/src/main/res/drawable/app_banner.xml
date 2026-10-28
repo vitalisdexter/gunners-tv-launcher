@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="320dp" android:height="180dp" android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#171B24" android:pathData="M0,0H320V180H0Z"/>
+    <path android:fillColor="#86152A" android:pathData="M0,0H112V180H0Z"/>
+    <path android:fillColor="#F4E4C5" android:pathData="M22,65H83V76H22Z M75,61H90V80H75Z M28,80H64L72,92H31Z"/>
+    <path android:fillColor="#F4E4C5" android:fillType="evenOdd" android:pathData="M54,88A17,17 0,1 1,53.99 88M54,95A10,10 0,1 0,54.01 95"/>
+    <!-- Original geometric G T V lettering. -->
+    <path android:fillColor="#F4E4C5" android:pathData="M138,62H176V72H148V108H166V94H157V84H176V118H138Z M187,62H228V73H213V118H202V73H187Z M238,62H249L260,103L271,62H282L266,118H254Z"/>
+    <path android:fillColor="#86152A" android:pathData="M138,132H282V136H138Z"/>
+</vector>

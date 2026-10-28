@@ -1,0 +1,18 @@
+<resources>
+    <!-- Optional weather override. Empty uses TV timezone city where available. -->
+    <string name="weather_city" translatable="false"></string>
+    <string name="weather_latitude" translatable="false"></string>
+    <string name="weather_longitude" translatable="false"></string>
+    <string-array name="default_favourites">
+        <item>com.google.android.youtube.tv</item>
+        <item>com.netflix.ninja</item>
+        <item>com.amazon.amazonvideo.livingroom</item>
+        <item>com.apple.atve.androidtv.appletv</item>
+        <item>com.spotify.tv.android</item>
+        <item>com.google.android.youtube.tvmusic</item>
+    </string-array>
+    <!-- ESPN team IDs; all competitions. Public starter preset, not account data. -->
+    <string-array name="followed_club_ids"><item>359</item><item>363</item><item>382</item><item>360</item><item>364</item><item>367</item></string-array>
+    <!-- Supported players: Ronaldo 22774, Mbappé 231388. Remove either item to stop following. -->
+    <string-array name="followed_player_ids"><item>22774</item><item>231388</item></string-array>
+</resources>

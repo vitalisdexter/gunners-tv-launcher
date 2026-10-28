@@ -1,0 +1,116 @@
+[
+  {
+    "path": "app/src/main/res/drawable-nodpi/fjord.png",
+    "sha256": "9fb18c1b8a8ce8731b9ae01779292130c729348023f68dd333b960f15b671178",
+    "origin": "Upstream AI-generated Fjord image/layers, MIT distribution",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/fjord_sky.png",
+    "sha256": "4e3930594b9336e8a0e490dafbf3d750bdab4e5dbe2c539aa831618c5ae8c84c",
+    "origin": "Upstream AI-generated Fjord image/layers, MIT distribution",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/fjord_terrain.png",
+    "sha256": "ecb936d7e2975435434baea8329f4a4f5b4baee82e94bc21af04671daacd076a",
+    "origin": "Upstream AI-generated Fjord image/layers, MIT distribution",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_0.jpg",
+    "sha256": "1c6077050b6ced271e880d7f07047613b6367ad6ca5068f072079220d7683a78",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_1.jpg",
+    "sha256": "c219dcb1fbebd11a472e01a571355167bd42c726941e099d87532ace6813fd70",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_2.jpg",
+    "sha256": "93752fdc704bfd550ce147b038d7b4cd9515a2665cc493f66d842a929806db21",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_3.jpg",
+    "sha256": "51b42a7282e30f68c920c8e5ed58a66913c35a01d3941cfff6c43bbab69ad39e",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_4.jpg",
+    "sha256": "51a044e82a2c5ef468ffe5e6426fe6c74642b1891d292f95f0a519bc54a7aaeb",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_5.jpg",
+    "sha256": "85ed413ffc183e41908ac914766d9f2de88c76f3246b5db07fcf72224fdbd676",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_6.jpg",
+    "sha256": "b15285b1fb78ae207867c7fe8f99aa0055e34f3d1115f5d0ed897e85eead26b0",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/thumb_7.jpg",
+    "sha256": "cbcb2cb5d13ff5e7985d597beb6c05fa0da59b04cf1f604181b2ee31ca48c10a",
+    "origin": "Thumbnail of the documented upstream wallpaper set",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_dawn.jpg",
+    "sha256": "14cc87a19d8a01179b914c37da1ba5f733d054b8fc38611a5f9b5986d0f5f912",
+    "origin": "Reprojected Poly Haven CC0 panorama",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_milkyway.jpg",
+    "sha256": "b775946eb146c7c61c9ee8da6e08cfdf097013868ee29b6ff9ae387ccfb4b6c1",
+    "origin": "Reprojected Poly Haven CC0 panorama",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_sea.jpg",
+    "sha256": "479ca528bd30fb6e1dd3c5d50c940045724306174d11ed9cfce97817e3901333",
+    "origin": "Reprojected Poly Haven CC0 panorama",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_silk.jpg",
+    "sha256": "fa539bcea426b042929c877bdacb12a27d03bba915670e9f1f304012338f0f55",
+    "origin": "Upstream Blender-generated silk artwork, MIT",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_silver_day.jpg",
+    "sha256": "7604494be15054e6bd6e057128429c39990f2ff35c6bef551d0c23b2c44c8d50",
+    "origin": "Upstream Blender-generated silk artwork, MIT",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/drawable-nodpi/wp_silver_night.jpg",
+    "sha256": "7dc0bce8e76e6e6d441e7367999807bc31516c1ac94cd87fb2273210a6ad411f",
+    "origin": "Upstream Blender-generated silk artwork, MIT",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/raw/soft_open.wav",
+    "sha256": "7ee46bcefc78bf254c80e427a9e9002ecd682cef743ac5fa207b03728f1974ed",
+    "origin": "Synthesized navigation sound; upstream tools/generate_sounds.py, MIT",
+    "matches_reference": true
+  },
+  {
+    "path": "app/src/main/res/raw/soft_step.wav",
+    "sha256": "f2de26dad2ca14d8c8106bb0d97c19d8a5ded84b5c2cc190ae8ab920a6ac2b63",
+    "origin": "Synthesized navigation sound; upstream tools/generate_sounds.py, MIT",
+    "matches_reference": true
+  }
+]

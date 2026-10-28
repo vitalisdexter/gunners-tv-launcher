@@ -147,7 +147,7 @@ final class ForecastClock {
         private final int code;
         private boolean moving;
         WeatherAnimation(android.content.Context context,int code) {super(context);this.code=code;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
-        @Override protected void onAttachedToWindow() {super.onAttachedToWindow();moving=Settings.Global.getFloat(getContext().getContentResolver(),Settings.Global.ANIMATOR_DURATION_SCALE,1)>0;}
+        @Override protected void onAttachedToWindow() {super.onAttachedToWindow();moving=getContext().getSharedPreferences("gunners",0).getBoolean("motion",true)&&Settings.Global.getFloat(getContext().getContentResolver(),Settings.Global.ANIMATOR_DURATION_SCALE,1)>0;}
         @Override protected void onDetachedFromWindow() {moving=false;super.onDetachedFromWindow();}
         @Override protected void onDraw(Canvas canvas) {
             float w=getWidth(),h=getHeight(),phase=moving?(SystemClock.uptimeMillis()%6000)/6000f:0;

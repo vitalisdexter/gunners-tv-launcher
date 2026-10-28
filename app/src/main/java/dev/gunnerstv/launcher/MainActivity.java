@@ -164,7 +164,7 @@ public final class MainActivity extends Activity {
         wallpaper.pauseAmbient();wallpaper.rest();
     }
     @Override public void onWindowFocusChanged(boolean focused) { super.onWindowFocusChanged(focused);if(wallpaper!=null)wallpaper.syncAmbient(); }
-    @Override protected void onDestroy() { getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
+    @Override protected void onDestroy() { MatchCentre.dismissFor(this); getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if(intent.getBooleanExtra("personal.resume_home",false))prefs.edit().putBoolean("redirect_home",true).apply();

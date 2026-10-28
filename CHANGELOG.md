@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 — optional support link
+
+Added Vitalis's Buy Me a Coffee link to the README and launcher Settings/About. The TV screen displays an offline QR code and an optional browser action with a no-browser fallback. Added no app permission, runtime dependency, payment integration or paid feature. Physical TV navigation/scanning/browser checks remain to be performed.
+
 ## Unreleased — documentation and repository presentation
 
 Updated the installation prompt and manual setup guide to start from the public GitHub repository on Windows, macOS or Linux without GitHub login. Moved football resource customisation before compilation, documented tool setup, signer retention and replacement of a previous launcher redirect, and replaced outdated unpublished-repository statements.

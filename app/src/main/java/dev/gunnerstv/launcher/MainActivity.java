@@ -830,7 +830,28 @@ public final class MainActivity extends Activity {
     private void aboutScreen(){
         new AlertDialog.Builder(this).setTitle("Gunner's TV Launcher · "+version())
             .setMessage("Your apps, match centre, music and weather in one home. A newly branded derivative built with open-source components. No analytics. Provider feeds and football coverage depend on their services. Not affiliated with any club or streaming provider.")
+            .setNegativeButton(R.string.support_title,(d,w)->supportScreen())
             .setNeutralButton("Open-source licences",(d,w)->licencesScreen()).setPositiveButton("Done",null).show();
+    }
+    private void supportScreen(){
+        FrameLayout o=openOverlay(0xA6000000);
+        FrameLayout panel=new FrameLayout(this);panel.setBackground(shape(0xF51C1C1E,24));panel.setElevation(px(24));
+        FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(px(640),px(360));lp.gravity=Gravity.CENTER;o.addView(panel,lp);
+        panel.addView(text(getString(R.string.support_title),24,Color.WHITE,"sans-serif-medium"),pos(584,34,28,24));
+        ImageView qr=new ImageView(this);qr.setImageResource(R.drawable.support_qr);qr.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if(qr.getDrawable() instanceof BitmapDrawable)((BitmapDrawable)qr.getDrawable()).setFilterBitmap(false);
+        qr.setBackground(shape(Color.WHITE,12));qr.setContentDescription(getString(R.string.support_qr_description));panel.addView(qr,pos(204,204,28,82));
+        TextView scan=text(getString(R.string.support_scan),12,0xC7FFFFFF,"sans-serif");scan.setGravity(Gravity.CENTER);panel.addView(scan,pos(204,24,28,294));
+        panel.addView(text(getString(R.string.support_headline),21,Color.WHITE,"sans-serif-medium"),pos(350,28,260,84));
+        TextView body=text(getString(R.string.support_message),14,0xC7FFFFFF,"sans-serif");body.setLineSpacing(px(3),1);panel.addView(body,pos(350,72,260,122));
+        panel.addView(text(getString(R.string.support_url),13,0xFFFFFFFF,"sans-serif"),pos(350,42,260,200));
+        LinearLayout buttons=new LinearLayout(this);buttons.setOrientation(LinearLayout.VERTICAL);panel.addView(buttons,pos(364,100,250,250));
+        View open=menuRow(buttons,getString(R.string.support_open),false,this::openSupportLink);
+        menuRow(buttons,"Done",false,()->closeOverlay(false));root.post(open::requestFocus);
+    }
+    private void openSupportLink(){
+        try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(R.string.support_url))).addCategory(Intent.CATEGORY_BROWSABLE));}
+        catch(ActivityNotFoundException|SecurityException unavailable){Toast.makeText(this,R.string.support_no_browser,Toast.LENGTH_LONG).show();}
     }
     // Stock HOME packages; this project never disables them.
     static final String[] STOCK_HOMES={"com.google.android.tvlauncher","com.google.android.apps.tv.launcherx","com.google.android.leanbacklauncher"};
@@ -955,6 +976,7 @@ public final class MainActivity extends Activity {
         caption(list,"System",false);
         controls.add(option(list,"Device settings",()->"",null,()->startActivity(new Intent(Settings.ACTION_SETTINGS)),()->preview(0,"Device settings","Network, picture, sound and accounts.")));
         controls.add(option(list,"About Gunner's",()->"",null,this::aboutScreen,()->preview(0,"About Gunner's","Version "+version()+" · Open-source components")));
+        controls.add(option(list,getString(R.string.support_title),()->"",null,this::supportScreen,()->preview(0,getString(R.string.support_title),getString(R.string.support_preview))));
         controls.add(option(list,"Content sources",()->"Status",null,this::feedStatus,()->preview(0,"Content sources","See which apps are sharing recommendations and resume titles. Empty feeds stay hidden.")));
         content.setTag(controls);
         preview(THUMBS[wp],WALLPAPERS[wp],"Eight wallpapers, from silver silk to the Milky Way. Silver is light by day and dark after sunset.");

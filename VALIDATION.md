@@ -1,6 +1,16 @@
 # Local verification
 
-Documentation update: product/setup docs were expanded and component legal files organised under `legal/`. Markdown links, branding exceptions and unchanged runtime/build source were checked separately. The build results below apply to the executable source, which this documentation update does not change; no additional TV test is claimed.
+## 1.0.1 support link
+
+Local verification on 28 October 2026 ran `testReleaseUnitTest lintRelease assembleRelease assembleDebug`: **68 tests passed, zero failures; lint 0 errors/63 warnings** (same warning IDs/counts as the preparation baseline). Both APKs assembled with package `dev.gunnerstv.launcher`, version `1.0.1`/code `2`. Debug signing verified with the same private local QA identity; the release is unsigned. These APKs are local evaluation artefacts, not a production download.
+
+The support QR was independently decoded to the exact approved `https://buymeacoffee.com/vitalisdexter` URL, including resized 204/306/408-pixel images. The asset is bundled and displayed offline; browser navigation is user-initiated and catches missing/blocked handlers. Source review checked overlay focus/Back handling, the two support entry points, no new permissions/dependencies and asset hashes. Physical TV rendering, phone-camera scanning, browser return and no-browser fallback have not been tested on a device.
+
+The first sandbox build could not access a local SDK build-tools JAR. Verification succeeded after using the authorized SDK access; this was a local environment failure. Current hosted results are linked in [GitHub Actions](https://github.com/vitalisdexter/gunners-tv-launcher/actions).
+
+## 1.0.0 preparation baseline
+
+Earlier documentation updates expanded product/setup docs and organised component legal files under `legal/`. Markdown links, branding exceptions and unchanged executable source were checked separately at that point; no TV test was claimed.
 
 Fresh independent checkout of source commit `299c55c7d398d6f53c62bb2e981fbb6e8c7cc53b`. Java 17, Android SDK 34, wrapper 8.9, AGP 8.5.2. Commands: `testReleaseUnitTest lintRelease assembleRelease assembleDebug`. The local verification machine used an ordinary warm dependency cache and an installed SDK outside the checkout; source does not depend on their paths. Hosted verification is recorded separately below.
 

@@ -2,7 +2,7 @@
 
 A football-focused home screen for Android TV and Google TV: your apps, fixtures, weather and music in one place.
 
-Version: **1.0.0 / 1**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
+Version: **1.0.1 / 2**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
 
 ## Features
 
@@ -55,6 +55,10 @@ Local verification and remaining physical checks are recorded in [VALIDATION.md]
 ## Licence and contributions
 
 Gunner's is independently branded and includes open-source components. Required attribution and component records are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [legal/SOURCE-PROVENANCE.md](legal/SOURCE-PROVENANCE.md). Artwork records are in [ASSETS.md](ASSETS.md). See [CONTRIBUTING.md](CONTRIBUTING.md) for changes and [CHANGELOG.md](CHANGELOG.md) for release notes.
+
+## Support my work
+
+Enjoying Gunner's or my other projects? **[☕ Buy me a coffee](https://buymeacoffee.com/vitalisdexter)** to support my work. Thank you! Support is optional and unlocks no app features. In the launcher, Settings → Buy me a coffee (also available in About) shows the same link and a QR code for your phone.
 
 ## Illustrative preview
 

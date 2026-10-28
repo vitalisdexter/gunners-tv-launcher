@@ -1,5 +1,11 @@
 [
   {
+    "path": "app/src/main/res/drawable-nodpi/support_qr.png",
+    "sha256": "e137752635585ee3a52984fabd4af46e36f6f1ad9d382dd1a31efe1de585bb73",
+    "origin": "Locally generated QR encoding of the public Buy Me a Coffee URL; no logos or third-party artwork",
+    "matches_reference": false
+  },
+  {
     "path": "app/src/main/res/drawable-nodpi/fjord.png",
     "sha256": "9fb18c1b8a8ce8731b9ae01779292130c729348023f68dd333b960f15b671178",
     "origin": "Upstream AI-generated Fjord image/layers, MIT distribution",

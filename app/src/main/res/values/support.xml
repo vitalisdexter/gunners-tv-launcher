@@ -1,0 +1,11 @@
+<resources>
+    <string name="support_url" translatable="false">https://buymeacoffee.com/vitalisdexter</string>
+    <string name="support_title">Buy me a coffee</string>
+    <string name="support_headline">Support Vitalis</string>
+    <string name="support_message">Enjoying my projects? A coffee helps me keep building and improving them. Support is optional. Thank you!</string>
+    <string name="support_scan">Scan with your phone</string>
+    <string name="support_qr_description">QR code for Vitalis on Buy Me a Coffee</string>
+    <string name="support_open">Open link</string>
+    <string name="support_no_browser">No browser available. Scan the QR code with your phone instead.</string>
+    <string name="support_preview">Support Vitalis and his projects. Scan the QR code with your phone or open the link.</string>
+</resources>

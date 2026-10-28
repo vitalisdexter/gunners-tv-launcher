@@ -32,3 +32,9 @@ Content comes only from Android TV records that installed apps publish. Netflix/
 No private app databases, account passwords, playlist credentials or analytics are collected. See [PRIVACY.md](PRIVACY.md). Runtime club/provider logos are their owners’ marks, not a claim of endorsement. This project is not affiliated with Arsenal, any league, provider or TV manufacturer.
 
 Local verification and remaining physical checks are recorded in [VALIDATION.md](VALIDATION.md). A successful build is not proof of correct behaviour on every TV. Hosted CI has not run until this repository is published with approval.
+
+## Illustrative preview
+
+![Synthetic layout illustration, not a device screenshot](docs/demo-preview.png)
+
+The diagram communicates the layout family only; labels, weather and scores are synthetic. It is not runtime validation.

@@ -13,7 +13,7 @@ import java.util.*;
 final class MatchCentre extends Dialog {
     private static final int WHITE=0xFFF4F5F7,MUTED=0xFF9DAAB7,MINT=0xFFA9E6CA;
     private static final String[] TITLES={"Overview","Head to head","Lineups","Commentary"};
-    private static MatchCentre current;
+    private static java.lang.ref.WeakReference<MatchCentre> current=new java.lang.ref.WeakReference<>(null);
     private final WidgetBoard.Host host;
     private final ArsenalMatch match;
     private final Handler timer=new Handler(Looper.getMainLooper());
@@ -28,10 +28,17 @@ final class MatchCentre extends Dialog {
     private boolean loading,foreground;
     private String error="";
     private final Runnable refreshTick=this::refresh;
-    static void dismissOpen(){if(current!=null)current.dismiss();}
+    static void dismissOpen(){MatchCentre open=current.get();if(open!=null)open.dismiss();}
+    static void dismissFor(android.app.Activity owner){
+        MatchCentre open=current.get();
+        if(open!=null&&open.host.activity()==owner){
+            open.setOnDismissListener(null);open.timer.removeCallbacksAndMessages(null);
+            open.dismiss();current.clear();
+        }
+    }
     static void open(WidgetBoard.Host host,ArsenalMatch match,Runnable returned){
-        dismissOpen();MatchCentre centre=new MatchCentre(host,match);current=centre;
-        centre.setOnDismissListener(d->{centre.timer.removeCallbacksAndMessages(null);if(current==centre)current=null;returned.run();});centre.show();
+        dismissOpen();MatchCentre centre=new MatchCentre(host,match);current=new java.lang.ref.WeakReference<>(centre);
+        centre.setOnDismissListener(d->{centre.timer.removeCallbacksAndMessages(null);if(current.get()==centre)current.clear();returned.run();});centre.show();
     }
     private MatchCentre(WidgetBoard.Host host,ArsenalMatch match){
         super(host.activity(),android.R.style.Theme_Material_NoActionBar);this.host=host;this.match=match;

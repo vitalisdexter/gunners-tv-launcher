@@ -2,6 +2,8 @@
 
 ## Unreleased — documentation and repository presentation
 
+Pinned hosted verification to Ubuntu 24.04 and an explicit SDK manager path after the first GitHub run stopped with `sdkmanager: command not found` on `ubuntu-latest`.
+
 Added installation intake questions for Arsenal as main club, followed clubs, followed players and club/international fixture preferences, with explicit current configuration limits.
 
 Expanded the product README, installation/recovery guide and reusable assistant installation prompt. Moved component provenance and standalone component licence files under `legal/`, preserving their text. Legacy product/developer references are confined to legal attribution and historical Git records. No runtime code, package identity or APK was changed in this documentation update.

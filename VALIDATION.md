@@ -1,5 +1,15 @@
 # Local verification
 
+## 1.1.0 football setup, focus and media sessions
+
+On 29 October 2026, local `testReleaseUnitTest lintRelease assembleRelease assembleDebug` passed: **97 tests, zero failures/errors; lint 0 errors/65 warnings**. Debug and unsigned release APKs assembled as `dev.gunnerstv.launcher`, version `1.1.0`/code `3`, minimum API 26/target 34. The debug signer remains the same private local QA identity; release assembly is unsigned. Hosted results are available in [GitHub Actions](https://github.com/vitalisdexter/gunners-tv-launcher/actions).
+
+New regression cases cover viewport edges/halo/reorder positions, empty and persisted football selections, main-club changes/removal, bounded selection counts, player scope/team associations, football UID filtering, similarly named clubs, arbitrary player profiles, national-side classification, media metadata fallback, strict playback-state priority and capability-based commands. Live read-only public-directory smoke resolved Lamine Yamal (Barcelona/Spain) and Bukayo Saka (Arsenal/England), without fixed player mappings or bundled raw feeds.
+
+Warning counts remain the original categories: `VectorRaster:1`, `DiscouragedApi:2`, `SetJavaScriptEnabled:1`, `DrawAllocation:11`, `UnusedResources:3`, `ViewConstructor:12`, `SetTextI18n:24`, `RtlHardcoded:11`. Compared with 1.0.1, the two additional warnings concern the programmatically created `FocusScrollView` constructor (not inflated from XML) and an English media-status text path. They are recorded rather than suppressed; existing warning triage below still applies.
+
+No TV was contacted. Actual DPAD/keyboard interaction, focus visibility while scrolling/reordering, setup save/relaunch and live provider controls still require a reinstall/device test. The reported YouTube Music playback stop on Home is **not claimed fixed**: session reconnection/controls can help only when the provider leaves a usable session. The app does not force background playback or read notification contents. The installation export/photo were reviewed privately and are not bundled.
+
 ## 1.0.1 support link
 
 Local verification on 28 October 2026 ran `testReleaseUnitTest lintRelease assembleRelease assembleDebug`: **68 tests passed, zero failures; lint 0 errors/63 warnings** (same warning IDs/counts as the preparation baseline). Both APKs assembled with package `dev.gunnerstv.launcher`, version `1.0.1`/code `2`. Debug signing verified with the same private local QA identity; the release is unsigned. These APKs are local evaluation artefacts, not a production download.

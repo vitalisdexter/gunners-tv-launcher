@@ -3,7 +3,7 @@ package dev.gunnerstv.launcher;
 import java.util.*;
 
 final class FootballPolicy {
-    static volatile Set<String> CLUBS=new HashSet<>(Arrays.asList("359","363","382","360","364","367"));
+    static volatile Set<String> CLUBS=Collections.emptySet();
     static boolean accepts(ArsenalMatch match){
         if(CLUBS.contains(match.homeId)||CLUBS.contains(match.awayId))return true;
         for(String id:match.playerNames.keySet()){
@@ -21,11 +21,12 @@ final class FootballPolicy {
         return out;
     }
     static List<ArsenalMatch> live(List<ArsenalMatch> matches,long now){List<ArsenalMatch> out=new ArrayList<>();for(ArsenalMatch m:matches)if(accepts(m)&&m.live()&&Math.abs(now-m.kickoff)<8*3600000L)out.add(m);out.sort(Comparator.comparingLong(m->m.kickoff));return out;}
-    static List<ArsenalMatch> widgetMatches(List<ArsenalMatch> matches,long now){
+    static List<ArsenalMatch> widgetMatches(List<ArsenalMatch> matches,long now,String mainClub){
         List<ArsenalMatch> out=live(matches,now);if(!out.isEmpty())return out;
+        if(!FootballSelection.id(mainClub))return out;
         ArsenalMatch next=null;
         for(ArsenalMatch m:matches){
-            if(!("359".equals(m.homeId)||"359".equals(m.awayId))||!"pre".equals(m.state)||m.kickoff<now)continue;
+            if(!(mainClub.equals(m.homeId)||mainClub.equals(m.awayId))||!"pre".equals(m.state)||m.kickoff<now)continue;
             String status=m.status.toLowerCase(Locale.ROOT);if(status.contains("postpon")||status.contains("cancel")||status.contains("abandon"))continue;
             if(next==null||m.kickoff<next.kickoff)next=m;
         }

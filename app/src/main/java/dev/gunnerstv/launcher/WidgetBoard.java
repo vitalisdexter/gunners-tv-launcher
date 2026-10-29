@@ -39,11 +39,11 @@ final class WidgetBoard extends FrameLayout {
     static String title(String id){FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return row.title;switch(id){case "football":return "Football fixtures";case "house":return "Smart Home";case "inputs":return "Inputs";case "upnext":return "Continue Watching";case "recommendations":return "Recommendations";case "arsenal":return "Live matches";case "weather":return "Weather";case "music":return "Now Playing";default:return "Control";}}
     static String glyph(String id){FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return row.music?"note":"tv";switch(id){case "house":return "home";case "inputs":return "hdmi";case "upnext":case "recommendations":return "tv";case "football":case "arsenal":return "play";case "weather":return "partly";case "music":return "note";default:return "gear";}}
     static String about(String id){if(FeedCatalog.row(id)!=null)return "Up to six app-shared titles. Hidden when the app publishes no matching content. Hold OK for more.";switch(id){
-        case "football":return "Six clubs, Ronaldo and Mbappé · Fixtures, scores, lineups and goals.";
+        case "football":return "Your chosen clubs and players · Fixtures, scores, lineups and goals. Configure in Football setup.";
         case "house":return "Scenes and your live 3D home, from House Control TV.";
         case "upnext":return "Six shared resume titles in an idle carousel. It pauses while you browse. Hold OK for all titles.";
         case "recommendations":return "Six real recommendations in an idle carousel. It pauses while you browse. Hold OK for all titles.";
-        case "arsenal":return "Arsenal's next game until a selected fixture is live. Left / Right browses simultaneous live games.";
+        case "arsenal":return "Your main club's next game until a selected fixture is live. Left / Right browses simultaneous live games.";
         case "weather":return "Now, the next hours and the coming days where you are.";
         case "music":return "What's playing on this TV, with play, pause and skip.";
         case "inputs":return "Your HDMI devices and live TV: switch to a console or a set-top box in one press.";

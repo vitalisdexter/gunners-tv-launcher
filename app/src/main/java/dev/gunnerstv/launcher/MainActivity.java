@@ -104,6 +104,7 @@ public final class MainActivity extends Activity {
         }
     };
     private String[] FIRST;
+    private FootballSetup footballEditor;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -137,6 +138,7 @@ public final class MainActivity extends Activity {
         createShell();
         try{getContentResolver().registerContentObserver(Uri.parse("content://android.media.tv"),true,feedObserver);}catch(RuntimeException ignored){}
         discover();
+        root.post(()->{if(!FootballSettings.completed(this)&&!isFinishing())footballSetup(true);});
     }
 
     @Override protected void onResume() {
@@ -164,7 +166,7 @@ public final class MainActivity extends Activity {
         wallpaper.pauseAmbient();wallpaper.rest();
     }
     @Override public void onWindowFocusChanged(boolean focused) { super.onWindowFocusChanged(focused);if(wallpaper!=null)wallpaper.syncAmbient(); }
-    @Override protected void onDestroy() { MatchCentre.dismissFor(this); getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
+    @Override protected void onDestroy() { if(footballEditor!=null)footballEditor.close();MatchCentre.dismissFor(this); getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if(intent.getBooleanExtra("personal.resume_home",false))prefs.edit().putBoolean("redirect_home",true).apply();
@@ -970,6 +972,9 @@ public final class MainActivity extends Activity {
             ()->preview(0,"Weather location","Use a city and coordinates, or leave blank for the TV time zone. No location permission is needed.")));
         controls.add(option(list,"Temperature",()->new String[]{"Automatic","Celsius","Fahrenheit"}[unitIndex()],null,this::temperatureMenu,
             ()->preview(0,"Temperature","Weather in Celsius or Fahrenheit. Automatic follows the TV's region. The forecast is for "+"your configured location.")));
+        footballRow=controls.size();
+        controls.add(option(list,"Football setup",()->FootballSettings.load(this).summary(),null,()->footballSetup(false),
+            ()->preview(0,"Your football","Choose your main club, followed clubs and players. No personal preset or source edit is required.")));
         if(house)controls.add(option(list,"Scene apps",()->"Choose",null,this::sceneApps,()->preview(0,"Scene apps","Open an app after a scene — Movie can start Netflix as the lights go down.")));
         controls.add(option(list,"Home screen",()->launcherIsHome()?"Gunner's":"TV default",null,this::homeScreen,
             ()->preview(0,"Home screen",launcherIsHome()?"Gunner's opens when you press Home. Choose to return to your TV's own home screen.":"Your TV's own home screen opens when you press Home.")));
@@ -986,6 +991,11 @@ public final class MainActivity extends Activity {
         TextView c=text(label,13,ink(0x99),"sans-serif-medium");c.setPadding(px(10),0,0,0);
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,px(20));lp.topMargin=px(first?0:12);lp.bottomMargin=px(6);list.addView(c,lp);
     }
+    void footballSetup(boolean first){
+        if(footballEditor!=null||isFinishing())return;
+        footballEditor=new FootballSetup(this,unit,()->{if(page.equals("settings")){showPage("settings",false);controlsFocus(footballRow);}else showPage("home",false);},()->footballEditor=null);
+        footballEditor.show(first);
+    }
     private void recommendationSettings(){
         ArrayList<FeedCatalog.Row> choices=new ArrayList<>();for(FeedCatalog.Row row:FeedCatalog.ROWS)if(!row.resume)choices.add(row);
         CharSequence[] labels=new CharSequence[choices.size()];boolean[] checked=new boolean[choices.size()];
@@ -997,11 +1007,11 @@ public final class MainActivity extends Activity {
     private void feedStatus(){
         StringBuilder body=new StringBuilder();ContentFeedReader.Result feed=FeedCatalog.latest;
         for(FeedCatalog.Row row:FeedCatalog.ROWS){int count=feed==null?0:row.select(feed).size();body.append(row.title).append(": ").append(count==0?"not currently shared":count+" titles shared").append("\n");}
-        body.append("\nMusic uses recommendations shared by the TV apps. No Spotify Premium or account connection is needed for shared cards. YouTube watch history is not exposed.\n\nFootball: ESPN public feed. Your six clubs include every competition supplied by the provider. Ronaldo and Mbappé include club, cup and international matches; selection is pending until lineups are confirmed. The red widget shows Arsenal's next game whenever no selected match is live.");
+        body.append("\nMusic uses recommendations shared by the TV apps. No Spotify Premium or account connection is needed for shared cards. YouTube watch history is not exposed. Now Playing requires an active media session; some TV apps stop playback on Home.\n\nFootball: ESPN public feed. Choose clubs, players and a main club in Football setup. All supplied competitions are included; player participation stays pending until lineups are confirmed. The live widget falls back only to your selected main club.");
         if(feed!=null&&!feed.error.isEmpty())body.append("\n\n").append(feed.error);
         new AlertDialog.Builder(this).setTitle("Content sources").setMessage(body.toString()).setPositiveButton("Done",null).show();
     }
-    private ScrollView settingsScroll;private ValueAnimator settingsGlide;private int widgetsRow;
+    private ScrollView settingsScroll;private ValueAnimator settingsGlide;private int widgetsRow,footballRow;
     /** Scrolls the settings list so the focused row, with room for its lift and shadow (and its group's caption
      *  above the first row of a group), clears the faded edges. */
     private void reveal(View row){
@@ -1022,7 +1032,7 @@ public final class MainActivity extends Activity {
     private int unitIndex(){String u=prefs.getString("temp_unit","auto");return u.equals("c")?1:u.equals("f")?2:0;}
     private void temperatureMenu(){
         menu("Temperature",new String[]{"Automatic","Celsius","Fahrenheit"},unitIndex(),choice->{
-            prefs.edit().putString("temp_unit",new String[]{"auto","c","f"}[choice]).apply();showPage("settings",false);controlsFocus(widgetsRow+2);});
+            prefs.edit().putString("temp_unit",new String[]{"auto","c","f"}[choice]).apply();showPage("settings",false);controlsFocus(widgetsRow+3);});
     }
     private void widgetEditor(){new WidgetEditor();}
     /** Settings → Home widgets. OK turns a widget on or off; Hold OK picks it up, Up and Down move it, OK or Back
@@ -1032,6 +1042,7 @@ public final class MainActivity extends Activity {
         final HashSet<String> off=new HashSet<>();
         final HashMap<String,Runnable> paints=new HashMap<>();
         final LinearLayout list=new LinearLayout(MainActivity.this);
+        final FocusScrollView viewport=new FocusScrollView(MainActivity.this,px(10));
         final FrameLayout pages=new FrameLayout(MainActivity.this);
         final TextView hint;
         String moving;boolean ignoreUp;
@@ -1040,13 +1051,13 @@ public final class MainActivity extends Activity {
             FrameLayout o=openOverlay(0xB3000000);
             overlayCancel=()->root.post(()->{showPage("settings",false);controlsFocus(widgetsRow);});
             FrameLayout panel=new FrameLayout(MainActivity.this);panel.setBackground(shape(0xF51C1C1E,26));panel.setElevation(px(24));panel.setClipChildren(false);
-            float h=Math.max(440,98+order.size()*61+20); // grows with the number of widgets
+            float h=Math.min(480,getResources().getDisplayMetrics().heightPixels/unit-32);
             FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(px(760),px(h));lp.gravity=Gravity.CENTER;o.addView(panel,lp);
             panel.addView(text("Home widgets",24,Color.WHITE,"sans-serif-medium"),pos(420,32,28,26));
             hint=text("",13,0xB3FFFFFF,"sans-serif");hint.setSingleLine(true);panel.addView(hint,pos(420,18,29,64));setHint();
-            list.setOrientation(LinearLayout.VERTICAL);list.setClipChildren(false);list.setClipToPadding(false);list.setPadding(px(8),0,px(8),0);
-            panel.addView(list,pos(436,order.size()*61,20,98));
-            pages.setClipChildren(false);panel.addView(pages,pos(262,370,472,34));
+            list.setOrientation(LinearLayout.VERTICAL);list.setClipChildren(false);list.setClipToPadding(false);list.setPadding(px(12),0,px(12),0);
+            viewport.addView(list,new ScrollView.LayoutParams(-1,-2));panel.addView(viewport,pos(436,h-112,20,90));
+            pages.setClipChildren(true);panel.addView(pages,pos(262,Math.min(370,h-60),472,34));
             for(String id:order)list.addView(row(id),rowParams());
             drawPages();
             if(motion()){panel.setScaleX(.96f);panel.setScaleY(.96f);panel.animate().scaleX(1).scaleY(1).setDuration(360).setInterpolator(spring).start();}
@@ -1078,7 +1089,7 @@ public final class MainActivity extends Activity {
                 row.setAlpha(available(id)?1:.5f);
             };
             paints.put(id,paint);paint.run();
-            row.setOnFocusChangeListener((v,f)->{paint.run();lift(row,f);if(f)navigationSound(list.indexOfChild(row));});
+            row.setOnFocusChangeListener((v,f)->{paint.run();lift(row,f);if(f){navigationSound(list.indexOfChild(row));viewport.post(()->viewport.reveal(row));}});
             row.setOnClickListener(v->{
                 if(moving!=null)return;sound();
                 if(!available(id)){row.animate().cancel();row.setTranslationX(0);if(motion())row.animate().translationX(px(6)).setDuration(70).withEndAction(()->row.animate().translationX(0).setDuration(320).setInterpolator(new OvershootInterpolator(3f)).start()).start();return;}
@@ -1107,7 +1118,10 @@ public final class MainActivity extends Activity {
             Collections.swap(order,i,j);list.removeView(other);list.addView(other,i,rowParams());
             for(View v:new View[]{row,other}){float from=v==row?rowTop-otherTop:otherTop-rowTop;v.animate().cancel();v.setTranslationY(from);
                 if(motion())v.animate().translationY(0).setDuration(300).setInterpolator(ease).start();else v.setTranslationY(0);}
-            row.animate().scaleX(1.045f).scaleY(1.045f).setDuration(300).start();
+            if(motion())row.animate().scaleX(1.045f).scaleY(1.045f).setDuration(300).start();
+            else{row.setScaleX(1.045f);row.setScaleY(1.045f);}
+            viewport.post(()->viewport.reveal(row));
+            if(motion())viewport.postDelayed(()->viewport.reveal(row),320);
             navigationSound(j);save();drawPages();
         }
         void drop(View row){moving=null;sound();setHint();for(Runnable r:paints.values())r.run();lift(row,true);save();}

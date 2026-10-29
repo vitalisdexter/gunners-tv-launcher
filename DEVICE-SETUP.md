@@ -23,13 +23,13 @@ Leave the existing launcher available. Record the current default Home in a priv
 
 ## 2. Choose a signed APK
 
-Before choosing a prebuilt APK or building one, ask whether Arsenal should be the person's main club, which clubs they want fixtures for, and which players they want to follow (club matches, international matches or both). Allow no main club, no clubs or no players as preferences. See [CONFIGURATION.md](CONFIGURATION.md) for the current build-time options and fixed Arsenal fallback; explain unsupported preferences before proceeding. A prebuilt APK without a football editor cannot apply a different preset through this guide alone.
+Ask whether Arsenal should be the person's main club, which clubs they want fixtures for, and which players they want to follow (club matches, international matches or both). Allow no main club, no clubs or no players. Version 1.1.0 applies these choices in first-run setup or Settings → Football setup, without rebuilding. Check the actual APK version; older releases do not have this editor. See [CONFIGURATION.md](CONFIGURATION.md).
 
 Build locally by default. There is currently no published signed production APK. If choosing a prebuilt later, check the actual [Releases page](https://github.com/vitalisdexter/gunners-tv-launcher/releases) and its published SHA256/signer, or use a trusted signed file supplied deliberately. Do not assume that a source ZIP, unsigned release build or random search result is an official installable APK.
 
 Alternatively, build locally with Java 17, Android SDK platform 34 and build-tools 34.0.0:
 
-Apply any supported followed-club/player resource changes before building. Find the actual tool installations and set `JAVA_HOME` and `ANDROID_HOME`; ensure `sdkmanager` and `adb` are available via their real paths. Install missing SDK packages with Google's command-line tools or Android Studio and accept their licences. `sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"` supplies the required SDK components. The first build also downloads public Gradle dependencies.
+Football choices are now app settings; no personal source patch is needed. Find the actual tool installations and set `JAVA_HOME` and `ANDROID_HOME`; ensure `sdkmanager` and `adb` are available via their real paths. Install missing SDK packages with Google's command-line tools or Android Studio and accept their licences. `sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"` supplies the required SDK components. The first build also downloads public Gradle dependencies.
 
 ```powershell
 # Windows, from this repository's root
@@ -101,11 +101,13 @@ Windows users with a network target can instead use the supplied wrapper:
 
 ## 5. Configure the launcher
 
-Set your name and weather location in launcher Settings, then arrange favourites by holding OK on an app. Choose visible recommendations in Settings. Review the football choices collected before installation and distinguish what was applied from any unsupported preference. See [CONFIGURATION.md](CONFIGURATION.md) for supported followed-team/player defaults.
+Set your name and weather location in launcher Settings, then arrange favourites by holding OK on an app. Choose visible recommendations in Settings. In Football setup choose a main club or none, search/add your clubs and players, choose each player's scope, then Save. Reopen setup to check the saved choices. There is no preselected six-club/two-player list; upgrading from 1.0.x also asks for setup once. See [CONFIGURATION.md](CONFIGURATION.md) for coverage and limits.
 
 Grant TV listings access only if offered and wanted for shared content. Now Playing uses optional notification access to media sessions; the implementation does not process notification content, although Android's permission is broad. If access is declined or unavailable, leave that feature inactive. Wi-Fi, audio output and Google Home shortcuts depend on the firmware's handlers. No streaming accounts or private playlists need to be entered into this launcher.
 
 Rows appear only when supported apps publish suitable records. A signed-in YouTube app does not guarantee a Continue Watching feed. Do not treat an empty provider row as proof of failed installation.
+
+Now Playing requires a live/controllable media session, even with notification access enabled. YouTube Music may be handled by YouTube on TV; if that app stops playback or removes its session on Home, the launcher cannot supply background play. Music help explains this distinction. Test access, session visibility and control capabilities separately.
 
 ## 6. Choose Home, if wanted
 

@@ -42,7 +42,7 @@ final class FootballWidget extends Widget {
     @Override void setActive(boolean value){super.setActive(value);timer.removeCallbacks(refreshTick);timer.removeCallbacks(rotate);if(value){refresh();schedule();}else if(dialog!=null)dialog.dismiss();}
     @Override void refresh(){
         if(!active||loading)return;loading=true;
-        WidgetBoard.IO.execute(()->{ArsenalSource.Snapshot fresh=source.load(true);post(()->{
+        FootballSource.IO.execute(()->{ArsenalSource.Snapshot fresh=source.load(true);post(()->{
             loading=false;if(!isAttachedToWindow())return;data=fresh;render();
             if(dialog!=null&&details!=null)renderDetails();
             if(active){timer.removeCallbacks(refreshTick);timer.postDelayed(refreshTick,60000);}
@@ -87,7 +87,7 @@ final class FootballWidget extends Widget {
     private boolean canRotate(){return active&&isAttachedToWindow()&&isShown()&&hasWindowFocus()&&motion()&&!hasFocus()&&dialog==null&&cards.size()>3;}
     private void schedule(){timer.removeCallbacks(rotate);if(canRotate())timer.postDelayed(rotate,7000);}
     @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);if(focused)schedule();else timer.removeCallbacks(rotate);}
-    private String time(long at,String format){SimpleDateFormat f=new SimpleDateFormat(format,Locale.UK);f.setTimeZone(TimeZone.getTimeZone("Europe/London"));return f.format(new Date(at));}
+    private String time(long at,String format){SimpleDateFormat f=new SimpleDateFormat(format,Locale.getDefault());return f.format(new Date(at));}
     private String matchStatus(ArsenalMatch m){return m.live()?"LIVE · "+m.minute+" · "+m.status:"post".equals(m.state)?m.status:time(m.kickoff,"EEE d MMM · HH:mm")+(m.status.toLowerCase(Locale.ROOT).contains("postpon")?" · Postponed":"");}
     private void openDetails(){
         timer.removeCallbacks(rotate);if(dialog!=null){renderDetails();return;}
@@ -101,8 +101,9 @@ final class FootballWidget extends Widget {
     private void line(String value,float size,int color){TextView t=text(value,size,color,"sans-serif");t.setSingleLine(false);t.setPadding(0,px(6),0,px(6));details.addView(t,new LinearLayout.LayoutParams(-1,-2));}
     private void renderDetails(){
         if(details==null||data==null)return;View previous=details.findFocus();String tag=previous==null?"":String.valueOf(previous.getTag());details.removeAllViews();
-        line("Football · Match centre",28,Color.WHITE);line("Arsenal · Chelsea · Man City · Man United · Liverpool · Tottenham",11,0x99FFFFFF);
-        line("Following Cristiano Ronaldo & Kylian Mbappé across club and international competitions",11,0xBBBDA8F6);
+        FootballSelection selection=FootballSettings.load(getContext());
+        line("Football · Match centre",28,Color.WHITE);line(selection.summary()+" · Main: "+selection.mainName(),11,0x99FFFFFF);
+        line("Your chosen clubs and players · Every competition supplied by the provider",11,0xBBBDA8F6);
         ArsenalMatch chosen=null;for(ArsenalMatch m:data.matches)if(m.id.equals(selected)){chosen=m;break;}if(chosen==null&&!data.matches.isEmpty())chosen=data.matches.get(0);
         if(chosen!=null){
             line(chosen.title()+"   "+("pre".equals(chosen.state)?time(chosen.kickoff,"HH:mm"):chosen.score()),26,Color.WHITE);
@@ -110,7 +111,7 @@ final class FootballWidget extends Widget {
             if(!chosen.following().isEmpty())line(chosen.following(),14,0xFFD7C4FF);
             if(chosen.goals.isEmpty())line("pre".equals(chosen.state)?"Lineups and goal events appear when the provider publishes them.":"No goal events reported in this feed.",12,0x99FFFFFF);
             else for(String goal:chosen.goals)line("⚽  "+goal,14,0xFFEADFC4);
-            line("ESPN · "+(data.offline?"Cached · ":"")+"Updated "+time(chosen.updated,"d MMM HH:mm")+" · UK time",10,0x88FFFFFF);
+            line("ESPN · "+(data.offline?"Cached · ":"")+"Updated "+time(chosen.updated,"d MMM HH:mm")+" · TV local time",10,0x88FFFFFF);
         }
         line("Fixtures & recent results",18,Color.WHITE);
         for(int start=0;start<data.matches.size();start+=3){
@@ -125,7 +126,7 @@ final class FootballWidget extends Widget {
         if(details.findFocus()==null){View v=details.findViewWithTag("detail:"+selected);if(v!=null)v.requestFocus();}
     }
     private void refreshDetail(ArsenalMatch m){
-        WidgetBoard.IO.execute(()->{boolean ok=true;try{source.details(m);}catch(Exception e){ok=false;}final boolean success=ok;post(()->{if(!isAttachedToWindow())return;if(!success)Toast.makeText(getContext(),"Could not refresh. Showing saved match information.",Toast.LENGTH_SHORT).show();if(dialog!=null)renderDetails();});});
+        FootballSource.IO.execute(()->{boolean ok=true;try{source.details(m);}catch(Exception e){ok=false;}final boolean success=ok;post(()->{if(!isAttachedToWindow())return;if(!success)Toast.makeText(getContext(),"Could not refresh. Showing saved match information.",Toast.LENGTH_SHORT).show();if(dialog!=null)renderDetails();});});
     }
     @Override protected void onDetachedFromWindow(){active=false;timer.removeCallbacksAndMessages(null);if(dialog!=null)dialog.dismiss();super.onDetachedFromWindow();}
 }

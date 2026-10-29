@@ -107,11 +107,11 @@ final class MatchCentre extends Dialog {
     @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);foreground=focused;timer.removeCallbacks(refreshTick);if(focused&&isShowing())timer.postDelayed(refreshTick,60000);}
     private void refresh(){
         timer.removeCallbacks(refreshTick);if(loading||!isShowing())return;loading=true;refreshButton.setText("Updating…");stamp.setText("Updating match details…");
-        WidgetBoard.IO.execute(()->{String failure="";try{FootballSource.shared(getContext()).details(match);}catch(Exception e){failure="Connection unavailable · Showing saved match details";}final String problem=failure;
+        FootballSource.IO.execute(()->{String failure="";try{FootballSource.shared(getContext()).details(match);}catch(Exception e){failure="Connection unavailable · Showing saved match details";}final String problem=failure;
             timer.post(()->{loading=false;if(!isShowing())return;error=problem;refreshButton.setText("↻  Refresh");render();if(foreground)timer.postDelayed(refreshTick,match.live()?60000:5*60000);});
         });
     }
-    private String time(long at,String pattern){SimpleDateFormat f=new SimpleDateFormat(pattern,Locale.UK);f.setTimeZone(TimeZone.getTimeZone("Europe/London"));return f.format(new Date(at));}
+    private String time(long at,String pattern){SimpleDateFormat f=new SimpleDateFormat(pattern,Locale.getDefault());return f.format(new Date(at));}
     private String state(){return match.live()?"● LIVE  ·  "+MatchDetail.join(match.minute,match.status):"post".equals(match.state)?match.status:"KICKOFF  ·  "+time(match.kickoff,"EEE d MMM · HH:mm");}
     private TextView centered(String value,float size,int color){TextView t=label(value,size,color);t.setGravity(Gravity.CENTER);return t;}
     private void render(){
@@ -122,7 +122,7 @@ final class MatchCentre extends Dialog {
         hero.addView(centered(match.home,19,WHITE),pos(274,27,15,108));hero.addView(centered(match.away,19,WHITE),pos(274,27,575,108));
         TextView result=centered("pre".equals(match.state)?time(match.kickoff,"HH:mm"):match.score(),51,WHITE);result.setTypeface(Typeface.create("sans-serif-light",Typeface.NORMAL));hero.addView(result,pos(310,65,277,35));
         TextView status=centered(state(),10.5f,match.live()?MINT:0xDDE4ECF0);status.setBackground(round(match.live()?0x285EDBA7:0x16FFFFFF,12));hero.addView(status,pos(310,25,277,107));
-        renderBody(true);paintTabs();stamp.setText(error.isEmpty()?"ESPN  ·  "+(match.updated>0?"Updated "+time(match.updated,"HH:mm"):"Awaiting details")+"   /   UK time     ·     ← → Switch tabs     ·     ↓ Explore     ·     Back to fixtures":error);
+        renderBody(true);paintTabs();stamp.setText(error.isEmpty()?"ESPN  ·  "+(match.updated>0?"Updated "+time(match.updated,"HH:mm"):"Awaiting details")+"   /   TV local time     ·     ← → Switch tabs     ·     ↓ Explore     ·     Back to fixtures":error);
     }
     private void select(int target,boolean animate){
         if(body==null||target==tab){paintTabs();return;}positions[tab]=scroll.getScrollY();tab=target;renderBody(false);paintTabs();

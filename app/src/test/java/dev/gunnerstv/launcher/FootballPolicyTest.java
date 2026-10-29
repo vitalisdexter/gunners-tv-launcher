@@ -1,11 +1,15 @@
 package dev.gunnerstv.launcher;
 
 import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
 import org.json.*;
 import java.util.*;
 import static org.junit.Assert.*;
 
 public class FootballPolicyTest {
+    @Before public void selectClubs(){FootballPolicy.CLUBS=new HashSet<>(Arrays.asList("359","363","382","360","364","367"));}
+    @After public void clearClubs(){FootballPolicy.CLUBS=Collections.emptySet();}
     private ArsenalMatch match(String home,String away,String league){ArsenalMatch m=new ArsenalMatch();m.id="1";m.homeId=home;m.awayId=away;m.slug=league;return m;}
     private ArsenalMatch player(){ArsenalMatch m=match("86","87","esp.1");m.playerNames.put("231388","Kylian Mbappé");m.playerTeams.put("231388","86");return m;}
     @Test public void selectedClubsAppearAcrossEveryCompetition(){
@@ -71,21 +75,31 @@ public class FootballPolicyTest {
     @Test public void widgetFallsBackToEarliestArsenalGameAcrossCompetitions(){
         long now=1793000000000L;ArsenalMatch other=match("363","999","eng.fa"),later=match("359","999","eng.1"),cup=match("999","359","eng.league_cup");
         other.kickoff=now+1000;later.kickoff=now+200000;cup.kickoff=now+100000;
-        assertEquals(Collections.singletonList(cup),FootballPolicy.widgetMatches(Arrays.asList(later,other,cup),now));
+        assertEquals(Collections.singletonList(cup),FootballPolicy.widgetMatches(Arrays.asList(later,other,cup),now,"359"));
     }
     @Test public void selectedLiveGamesReplaceArsenalPreviewAndPreviewReturnsAfterFullTime(){
         long now=1793000000000L;ArsenalMatch arsenal=match("359","999","eng.1"),live=match("363","999","eng.league_cup");
         arsenal.kickoff=now+100000;live.kickoff=now-1000;live.state="in";
-        assertEquals(Collections.singletonList(live),FootballPolicy.widgetMatches(Arrays.asList(arsenal,live),now));
-        live.state="post";assertEquals(Collections.singletonList(arsenal),FootballPolicy.widgetMatches(Arrays.asList(arsenal,live),now));
+        assertEquals(Collections.singletonList(live),FootballPolicy.widgetMatches(Arrays.asList(arsenal,live),now,"359"));
+        live.state="post";assertEquals(Collections.singletonList(arsenal),FootballPolicy.widgetMatches(Arrays.asList(arsenal,live),now,"359"));
     }
     @Test public void arsenalPreviewSkipsPastFinishedPostponedAndCancelledFixtures(){
         long now=1793000000000L;ArsenalMatch old=match("359","999","eng.1"),ended=match("359","999","eng.fa"),postponed=match("359","999","eng.1"),cancelled=match("359","999","club.friendly"),next=match("999","359","uefa.champions");
         old.kickoff=now-1000;ended.kickoff=now+1000;ended.state="post";postponed.kickoff=now+2000;postponed.status="Postponed";cancelled.kickoff=now+3000;cancelled.status="Canceled";next.kickoff=now+4000;
-        assertEquals(Collections.singletonList(next),FootballPolicy.widgetMatches(Arrays.asList(old,ended,postponed,cancelled,next),now));
+        assertEquals(Collections.singletonList(next),FootballPolicy.widgetMatches(Arrays.asList(old,ended,postponed,cancelled,next),now,"359"));
     }
     @Test public void noArsenalFixtureDoesNotSubstituteAnotherUpcomingClub(){
         long now=1793000000000L;ArsenalMatch other=match("364","999","eng.1");other.kickoff=now+1000;
-        assertTrue(FootballPolicy.widgetMatches(Collections.singletonList(other),now).isEmpty());
+        assertTrue(FootballPolicy.widgetMatches(Collections.singletonList(other),now,"359").isEmpty());
+    }
+    @Test public void anotherMainClubAndNoMainAreRespected(){
+        long now=1793000000000L;ArsenalMatch club=match("364","999","eng.1");club.kickoff=now+1000;
+        assertEquals(Collections.singletonList(club),FootballPolicy.widgetMatches(Collections.singletonList(club),now,"364"));
+        assertTrue(FootballPolicy.widgetMatches(Collections.singletonList(club),now,"").isEmpty());
+        club.state="in";club.kickoff=now-1000;assertEquals(Collections.singletonList(club),FootballPolicy.widgetMatches(Collections.singletonList(club),now,""));
+    }
+    @Test public void removingLastClubDoesNotRestoreTheOldPreset(){
+        FootballPolicy.CLUBS=Collections.emptySet();assertFalse(FootballPolicy.accepts(match("359","363","eng.1")));
+        FootballPolicy.CLUBS=Collections.singleton("83");assertTrue(FootballPolicy.accepts(match("999","83","esp.1")));assertFalse(FootballPolicy.accepts(match("359","363","eng.1")));
     }
 }

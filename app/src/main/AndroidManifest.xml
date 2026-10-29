@@ -27,7 +27,7 @@
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /><category android:name="android.intent.category.LEANBACK_LAUNCHER" /></intent-filter>
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.HOME" /><category android:name="android.intent.category.DEFAULT" /></intent-filter>
         </activity>
-        <!-- Lets Now Playing see media sessions. Reads no notifications (MediaListener overrides nothing). -->
+        <!-- Lets Now Playing see media sessions. MediaListener observes connection lifecycle only, not notifications. -->
         <service android:name=".MediaListener" android:label="Gunner's Now Playing" android:exported="true" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
         </service>

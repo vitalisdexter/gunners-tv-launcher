@@ -2,7 +2,7 @@
 
 A football-focused home screen for Android TV and Google TV: your apps, fixtures, weather and music in one place.
 
-Version: **1.0.1 / 2**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
+Version: **1.1.0 / 3**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
 
 ## Features
 
@@ -11,8 +11,8 @@ Version: **1.0.1 / 2**. Android package: `dev.gunnerstv.launcher`. Minimum Andro
 - Utility widgets above the apps; recommendations and football fixtures below.
 - Separate recommendations and Continue Watching rows for supported providers when they share content with Android TV. Individual rows can be turned off.
 - Now Playing and shortcuts for Wi-Fi, audio output, Google Home and system settings, where the device supports them.
-- All-competition fixtures for followed clubs, plus supported player club/international tracking.
-- Live-match priority, upcoming Arsenal fallback, and a match centre with overview, head-to-head results, lineups and provider commentary.
+- First-run and Settings football setup: choose a main club or none, search for your own clubs/players, and select club/international/both player fixtures. No personal list is preselected; provider coverage applies.
+- All-competition fixtures for chosen clubs, live-match priority, chosen-main-club fallback, and a match centre with overview, head-to-head results, lineups and provider commentary. Times use the TV's local time zone.
 - Saved navigation position and Home-to-top behaviour.
 
 ## Install
@@ -44,7 +44,7 @@ This application has a new package identity and is a fresh setup, not an in-plac
 
 ## Limits
 
-Content comes only from Android TV records that installed apps publish. Netflix/YouTube/Prime/Apple TV may expose recommendations without resumable titles, or nothing. YouTube Continue Watching is supported by the launcher but depends on YouTube publishing suitable records; the launcher cannot retrieve YouTube watch history. Exact resume is controlled by each provider. Music rows do not access Spotify history or promise Premium features. Football endpoints are undocumented public ESPN endpoints with incomplete/delayed coverage and no service guarantee. Future player participation is tentative until a lineup/appearance is reported. Weather uses Open-Meteo; its service terms apply independently of this code licence.
+Content comes only from Android TV records that installed apps publish. Netflix/YouTube/Prime/Apple TV may expose recommendations without resumable titles, or nothing. YouTube Continue Watching is supported by the launcher but depends on YouTube publishing suitable records; the launcher cannot retrieve YouTube watch history. Exact resume is controlled by each provider. Music rows do not access Spotify history or promise Premium features. Now Playing needs a provider media session; the launcher cannot force YouTube/other apps to keep playing after Home. See [Now Playing setup](CONFIGURATION.md#now-playing). Football endpoints are undocumented public ESPN endpoints with incomplete/delayed coverage and no service guarantee; setup supports up to 12 clubs/8 players, with no search account/key. Future player participation is tentative until a lineup/appearance is reported. Weather uses Open-Meteo; its service terms apply independently of this code licence.
 
 The proposed YouTube football News tab is not part of this version. Planned features are not represented as installed.
 

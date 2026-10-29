@@ -4,44 +4,43 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import org.json.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /** Owner's club/player feed. Public ESPN fallback; no account, subscription or hidden app data. */
 final class FootballSource extends ArsenalSource {
-    static final String[] PLAYER_IDS={"22774","231388"};
-    static final String[] PLAYER_NAMES={"Cristiano Ronaldo","Kylian Mbappé"};
-    static final String[] NATIONAL_TEAMS={"482","478"};
+    static final ExecutorService IO=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"Gunner football");t.setDaemon(true);return t;});
+    private final Context context;
     private final SharedPreferences store;
-    private final Set<String> followedPlayers;
     static volatile String diagnostic="Not loaded";
     private static FootballSource shared;
     static synchronized FootballSource shared(Context c){if(shared==null)shared=new FootballSource(c.getApplicationContext());return shared;}
-    private Snapshot latest;private long loadedAt;
-    FootballSource(Context context){super(context);store=context.getSharedPreferences("football_cache",0);
-        FootballPolicy.CLUBS=Collections.unmodifiableSet(new HashSet<>(Arrays.asList(context.getResources().getStringArray(R.array.followed_club_ids))));
-        followedPlayers=new HashSet<>(Arrays.asList(context.getResources().getStringArray(R.array.followed_player_ids)));}
+    private Snapshot latest;private long loadedAt;private String selectionSignature;
+    FootballSource(Context context){super(context);this.context=context.getApplicationContext();store=context.getSharedPreferences("football_cache",0);}
     @Override synchronized Snapshot load(boolean network){
+        FootballSelection selection=FootballSettings.load(context);String signature=FootballSettings.signature(context);
+        if(!Objects.equals(selectionSignature,signature)){latest=null;loadedAt=0;selectionSignature=signature;}
+        FootballPolicy.CLUBS=Collections.unmodifiableSet(new HashSet<>(selection.clubs.keySet()));
         long now=System.currentTimeMillis();if(network&&latest!=null&&now-loadedAt<45000L)return latest;
         Snapshot result=new Snapshot();List<String> issues=new ArrayList<>();
+        if(selection.empty()){result.error="Choose your clubs and players in Settings → Football setup.";latest=result;loadedAt=now;diagnostic="No football selections";return result;}
         Map<String,List<String>> teamPlayers=new LinkedHashMap<>();
         for(String club:FootballPolicy.CLUBS)teamPlayers.put(club,new ArrayList<>());
-        for(int i=0;i<PLAYER_IDS.length;i++){
-            if(!followedPlayers.contains(PLAYER_IDS[i]))continue;
-            String id=PLAYER_IDS[i],team=store.getString("club_"+id,"");
-            if(network&&now-store.getLong("profile_attempt_"+id,0)>(team.isEmpty()?60000L:86400000L)){
+        for(FootballSelection.Player player:selection.players.values()){
+            if(!Objects.equals(signature,FootballSettings.signature(context))){result.error="Selections changed. Refreshing…";return result;}
+            String id=player.id,team=store.getString("club_"+id,player.club==null?"":player.club.id);
+            if(player.club()&&network&&now-store.getLong("profile_attempt_"+id,0)>(team.isEmpty()?60000L:86400000L)){
                 store.edit().putLong("profile_attempt_"+id,now).apply();
                 try{
-                    JSONObject athlete=get("https://site.web.api.espn.com/apis/common/v3/sports/soccer/athletes/"+id).getJSONObject("athlete");
-                    if(!id.equals(athlete.getString("id")))throw new JSONException("Wrong athlete");
-                    team=athlete.getJSONObject("team").getString("id");
-                    if(!team.matches("[0-9]+"))throw new JSONException("Invalid team");
-                    store.edit().putString("club_"+id,team).apply();
+                    FootballSelection.Player current=FootballDirectory.parseProfile(id,get(FootballDirectory.PROFILE+id).getJSONObject("athlete"));
+                    if(current.club!=null){team=current.club.id;store.edit().putString("club_"+id,team).apply();}
                 }catch(Exception e){result.offline=true;issues.add("Profile "+id+": "+e.getClass().getSimpleName());}
             }
-            if(!team.isEmpty())teamPlayers.computeIfAbsent(team,k->new ArrayList<>()).add(id);
-            teamPlayers.computeIfAbsent(NATIONAL_TEAMS[i],k->new ArrayList<>()).add(id);
+            if(player.club()&&FootballSelection.id(team))teamPlayers.computeIfAbsent(team,k->new ArrayList<>()).add(id);
+            if(player.international()&&player.national!=null)teamPlayers.computeIfAbsent(player.national.id,k->new ArrayList<>()).add(id);
         }
         Map<String,ArsenalMatch> merged=new LinkedHashMap<>();
         for(Map.Entry<String,List<String>> entry:teamPlayers.entrySet()){
+            if(!Objects.equals(signature,FootballSettings.signature(context))){result.error="Selections changed. Refreshing…";return result;}
             String team=entry.getKey();long at=store.getLong("schedule_at_"+team,0);
             JSONArray events=array(store.getString("schedule_"+team,"[]"));
             if(network&&now-at>=6*3600000L&&now-store.getLong("attempt_"+team,0)>=5*60000L){
@@ -64,7 +63,7 @@ final class FootballSource extends ArsenalSource {
             for(ArsenalMatch m:decode(events).matches){
                 ArsenalMatch target=merged.get(m.id);if(target==null){target=m;target.updated=at;merged.put(m.id,target);}
                 for(String player:entry.getValue()){
-                    target.playerNames.put(player,name(player));target.playerTeams.put(player,team);
+                    target.playerNames.put(player,selection.players.get(player).name);target.playerTeams.put(player,team);
                     target.playerStates.put(player,"Selection pending");
                 }
             }
@@ -73,6 +72,7 @@ final class FootballSource extends ArsenalSource {
         if(network&&ScoreboardRefresh.refresh(merged,store,now))result.offline=true;
         // Near kickoff and during play, refresh each relevant match; never extrapolate match minutes.
         for(ArsenalMatch match:merged.values()){
+            if(!Objects.equals(signature,FootballSettings.signature(context))){result.error="Selections changed. Refreshing…";return result;}
             String saved=store.getString("details_"+match.id,"");
             if(!saved.isEmpty())try{JSONObject cached=new JSONObject(saved);long at=store.getLong("details_at_"+match.id,0);if(at>=match.updated){applyDetails(match,cached);match.updated=at;}else{applySelection(match,cached);match.detail=MatchDetail.parse(match,cached);}}catch(Exception ignored){}
             boolean near=Math.abs(now-match.kickoff)<4*3600000L;
@@ -83,7 +83,7 @@ final class FootballSource extends ArsenalSource {
         }
         result.matches.addAll(FootballPolicy.select(new ArrayList<>(merged.values()),now));
         long followed=result.matches.stream().filter(m->!m.playerNames.isEmpty()).count();
-        diagnostic="matches="+result.matches.size()+" playerMatches="+followed+" teams="+teamPlayers.keySet()+" issues="+issues;
+        diagnostic="matches="+result.matches.size()+" playerMatches="+followed+" teams="+teamPlayers.size()+" issues="+issues.size();
         if(result.matches.isEmpty())result.error=result.offline?"Fixtures unavailable. Try again shortly.":"No matching fixtures in the next 28 days.";
         latest=result;loadedAt=now;return result;
     }
@@ -118,6 +118,5 @@ final class FootballSource extends ArsenalSource {
             }
         }
     }
-    private static String name(String id){for(int n=0;n<PLAYER_IDS.length;n++)if(PLAYER_IDS[n].equals(id))return PLAYER_NAMES[n];return id;}
     private static JSONArray array(String value){try{return new JSONArray(value);}catch(Exception e){return new JSONArray();}}
 }

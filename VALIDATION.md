@@ -1,5 +1,11 @@
 # Local verification
 
+## 1.3.0 directional app arrangement
+
+On 29 October 2026, local `testReleaseUnitTest lintRelease assembleRelease assembleDebug` passed: **126 tests, zero failures/errors; lint 0 errors/72 warnings**, unchanged warning counts from 1.2.0. Version `1.3.0`/code `5`, package `dev.gunnerstv.launcher`, minimum API 26/target 34. Debug QA uses the existing local evaluation signer; release is unsigned. New instructions use string resources, avoiding additional UI-string lint warnings. Current hosted checks are available in [GitHub Actions](https://github.com/vitalisdexter/gunners-tv-launcher/actions).
+
+Eight added regressions cover left/right and cross-row swaps while preserving the selected app, horizontal edges without wrapping, incomplete final rows, vertical bounds, hidden/unavailable package slots, input/draft isolation and invalid drafts/directions. The overlay holds an independent draft and persists only on OK; Back/Home cancellation and stable focus/scroll paths were reviewed. No permission, endpoint, runtime dependency or original source changed. No TV/emulator was contacted. Actual DPAD repeat/release, rendering, save/relaunch persistence, cancellation and app focus restoration need a physical reinstall test; passing model tests is not proof of those device behaviours.
+
 ## 1.2.0 shared content and football News
 
 On 29 October 2026, local 	estReleaseUnitTest lintRelease assembleRelease assembleDebug passed: **118 tests, zero failures/errors; lint 0 errors/72 warnings**. Both APKs assembled as dev.gunnerstv.launcher, version 1.2.0/code 4, minimum API 26/target 34. Debug QA uses the same private local evaluation signer; release assembly is unsigned. GitHub Actions verifies the public source separately.

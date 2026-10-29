@@ -1,6 +1,8 @@
 # Release preparation
 
-Current source version: **1.2.0 / versionCode 4**. Fixes stale Home content-row composition and listings refresh/access handling, adds safe Content sources diagnostics and an explicit Show shared rows on Home action, and implements Football centre → News with editable public YouTube fan channels. Existing football selections and row choices persist. No new runtime library or permission.
+Current source version: **1.3.0 / versionCode 5**. Adds Hold OK → Move app with directional rearranging, a highlighted/scrolling draft, OK to save and Back/Home to cancel. Works on Home's six visible apps and the full Apps grid. Existing quick moves and prior content/football functionality remain. No new runtime library or permission.
+
+Draft 1.3.0 release notes: Arrange apps with the remote's direction buttons and confirm once with OK. Back cancels without saving; selection returns to the chosen app. Home supports horizontal rearranging; Apps supports vertical swaps too. The original order is untouched until confirmation. Build with the existing installation's signer for a compatible update. Physical remote/scroll/persistence checks remain for the user's reinstall.
 
 Draft description: Six favourites and installed-app discovery, clock/greeting, utility widgets, weather/forecast, Now Playing, Wi-Fi/audio/Google Home shortcuts, and app-published content. Vertical content rows with visibility switches and restored focus; on-TV club/player/main-club setup, all-competition fixtures, live priority/chosen-main-club fallback, match centre with H2H, lineups, provider commentary and recent creator videos.
 

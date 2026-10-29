@@ -103,6 +103,8 @@ Windows users with a network target can instead use the supplied wrapper:
 
 Set your name and weather location in launcher Settings, then arrange favourites by holding OK on an app. Choose visible recommendations in Settings. In Football setup choose a main club or none, search/add your clubs and players, choose each player's scope, then Save. Reopen setup to check the saved choices. There is no preselected six-club/two-player list; upgrading from 1.0.x also asks for setup once. See [CONFIGURATION.md](CONFIGURATION.md) for coverage and limits.
 
+In 1.3.0+, hold OK → Move app, use arrows, then OK to save or Back to cancel. Home has one six-app row (left/right); Apps also supports up/down across rows. To choose a different Home favourite, move it earlier in the Apps grid; Home skips apps explicitly hidden from it. Verify both save/persistence and cancel, including the first/last positions and an incomplete final Apps row.
+
 Grant TV listings access only if offered and wanted for shared content. Now Playing uses optional notification access to media sessions; the implementation does not process notification content, although Android's permission is broad. If access is declined or unavailable, leave that feature inactive. Wi-Fi, audio output and Google Home shortcuts depend on the firmware's handlers. No streaming accounts or private playlists need to be entered into this launcher.
 
 Rows appear only when supported apps publish suitable records. A signed-in YouTube app does not guarantee a Continue Watching feed. Do not treat an empty provider row as proof of failed installation.

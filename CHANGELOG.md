@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 — directional app arrangement
+
+- Added Hold OK → Move app on Home and Apps. Direction buttons swap the selected app with the adjacent displayed app, with no row-edge wrap. Home supports its six-app row; Apps supports vertical movement across rows.
+- Added a bounded reorder preview with a visible selected-app border, position/instructions and scrolling. OK persists the order and restores selection; Back/Home cancels the unsaved draft. Hidden/unavailable entries retain their slots when rearranging the visible Home row. Existing one-step menu actions remain.
+- Added eight regressions for directional swaps, row/partial-row boundaries, hidden entries, draft isolation and input validation. No permission, network endpoint or runtime dependency added.
+
 ## 1.2.0 — shared content visibility and football News
 
 - Home row composition now uses the current readable feed rather than an obsolete availability cache, and discovery rebuilds a mismatched Home layout. Explicit per-row visibility preferences remain respected.

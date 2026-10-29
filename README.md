@@ -2,11 +2,12 @@
 
 A football-focused home screen for Android TV and Google TV: your apps, fixtures, weather and music in one place.
 
-Version: **1.2.0 / 4**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
+Version: **1.3.0 / 5**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
 
 ## Features
 
 - Six favourite apps, installed-app discovery and remote-friendly navigation.
+- Hold OK on an app → Move app: use the direction buttons to rearrange, OK to save, or Back to cancel. Home supports left/right across its six apps; the Apps tab also supports up/down across rows.
 - Clock, time-of-day greeting, configurable weather and animated forecast.
 - Utility widgets above the apps; recommendations and football fixtures below.
 - Separate recommendations and Continue Watching rows for supported providers when they share content with Android TV. Individual rows can be turned off.

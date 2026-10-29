@@ -918,18 +918,58 @@ public final class MainActivity extends Activity {
 
     private void appMenu(App app) {
         Set<String> hidden=new HashSet<>(prefs.getStringSet("hidden",Collections.emptySet()));
-        String[] choices={"Open", "Move to first position", "Move left", "Move right", hidden.contains(app.pkg) ? "Show on Home" : "Hide from Home", "App info"};
+        String[] choices={"Open", "Move app", "Move to first position", "Move left", "Move right", hidden.contains(app.pkg) ? "Show on Home" : "Hide from Home", "App info"};
         menu(app.label,choices,-1,index-> {
             if (index==0) { launch(app); return; }
+            if (index==1) { new AppMover(app).open(); return; }
             ArrayList<String> ids=order(); int current=ids.indexOf(app.pkg);
-            if (index==1) { ids.remove(app.pkg); ids.add(0,app.pkg); hidden.remove(app.pkg); }
-            if (index==2 && current>0) Collections.swap(ids,current,current-1);
-            if (index==3 && current<ids.size()-1) Collections.swap(ids,current,current+1);
-            if (index==4) { if (hidden.contains(app.pkg)) hidden.remove(app.pkg); else hidden.add(app.pkg); }
-            if (index==5) { startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:"+app.pkg))); return; }
+            if (index==2) { ids.remove(app.pkg); ids.add(0,app.pkg); hidden.remove(app.pkg); }
+            if (index==3 && current>0) Collections.swap(ids,current,current-1);
+            if (index==4 && current<ids.size()-1) Collections.swap(ids,current,current+1);
+            if (index==5) { if (hidden.contains(app.pkg)) hidden.remove(app.pkg); else hidden.add(app.pkg); }
+            if (index==6) { startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:"+app.pkg))); return; }
             prefs.edit().putString("order",String.join(",",ids)).putStringSet("hidden",hidden).apply();
             selectedPackage=app.pkg;showPage(page,true);
         });
+    }
+
+    /** One selected app follows the remote; the draft cannot launch apps or escape into widgets. */
+    private final class AppMover {
+        final App selected;final AppArrangement draft;final HashMap<String,FrameLayout> cards=new HashMap<>();
+        FrameLayout layer,grid;FocusScrollView viewport;TextView status;boolean saved;
+        AppMover(App app){selected=app;ArrayList<String> visible=new ArrayList<>();for(Tile tile:tiles)visible.add(tile.app.pkg);draft=new AppArrangement(order(),visible,app.pkg,6);}
+        void open(){
+            layer=openOverlay(0xCF080D16);for(Tile tile:tiles)if(tile.app.pkg.equals(selected.pkg))overlayReturn=tile;
+            overlayCancel=()->{selectedPackage=selected.pkg;showPage(page,true);};
+            int count=draft.items().size(),height=Math.min(456,128+((count+5)/6)*112);
+            FrameLayout panel=new FrameLayout(MainActivity.this);panel.setBackground(shape(0xFF19232F,24));FrameLayout.LayoutParams pp=new FrameLayout.LayoutParams(px(912),px(height));pp.gravity=Gravity.CENTER;layer.addView(panel,pp);
+            panel.addView(text(getString(R.string.move_app_title,selected.label),23,Color.WHITE,"sans-serif-medium"),pos(864,30,24,18));
+            panel.addView(text(getString(page.equals("home")?R.string.move_app_home_hint:R.string.move_app_grid_hint),13,0xFFB9C8D4,"sans-serif"),pos(864,22,24,54));
+            viewport=new FocusScrollView(MainActivity.this,px(6));grid=new FrameLayout(MainActivity.this);grid.setClipChildren(false);grid.setPadding(0,0,0,px(6));viewport.addView(grid,new ScrollView.LayoutParams(-1,px(((count+5)/6)*112+6)));panel.addView(viewport,pos(864,height-118,24,84));
+            status=text("",12,0xFFA9E6CA,"sans-serif-medium");panel.addView(status,pos(864,20,24,height-29));
+            for(String pkg:draft.items()){
+                App app=appIndex.get(pkg);if(app==null)continue;FrameLayout card=new FrameLayout(MainActivity.this);card.setClipChildren(false);
+                Art art=new Art(app);card.addView(art,pos(132,76,0,0));TextView label=text(app.label,11.5f,Color.WHITE,"sans-serif-medium");label.setGravity(Gravity.CENTER);card.addView(label,pos(132,20,0,82));cards.put(pkg,card);grid.addView(card,pos(132,104,0,0));
+                if(pkg.equals(selected.pkg)){
+                    GradientDrawable border=shape(Color.TRANSPARENT,16);border.setStroke(px(3),0xFFA9E6CA);View outline=new View(MainActivity.this);outline.setBackground(border);card.addView(outline,pos(132,76,0,0));
+                    card.setFocusable(true);card.setFocusableInTouchMode(true);card.setContentDescription(getString(R.string.move_app_accessibility,app.label));
+                    card.setOnClickListener(v->save());
+                    card.setOnKeyListener((v,key,event)->{
+                        boolean confirm=key==KeyEvent.KEYCODE_DPAD_CENTER||key==KeyEvent.KEYCODE_ENTER||key==KeyEvent.KEYCODE_NUMPAD_ENTER;
+                        int dx=key==KeyEvent.KEYCODE_DPAD_LEFT?-1:key==KeyEvent.KEYCODE_DPAD_RIGHT?1:0,dy=key==KeyEvent.KEYCODE_DPAD_UP?-1:key==KeyEvent.KEYCODE_DPAD_DOWN?1:0;
+                        if(confirm){if(event.getAction()==KeyEvent.ACTION_UP&&!event.isCanceled())save();return true;}
+                        if(dx!=0||dy!=0){if(event.getAction()==KeyEvent.ACTION_DOWN&&(event.getRepeatCount()==0||event.getRepeatCount()%2==0)&&draft.move(dx,dy)){navigationSound(draft.index());render();}return true;}return false;
+                    });
+                }
+            }
+            render();root.post(()->{if(overlay==layer){FrameLayout card=cards.get(selected.pkg);if(card!=null)card.requestFocus();}});
+        }
+        void render(){
+            for(int n=0;n<draft.items().size();n++){FrameLayout card=cards.get(draft.items().get(n));if(card==null)continue;FrameLayout.LayoutParams p=pos(132,104,(n%6)*144,(n/6)*112);card.setLayoutParams(p);}
+            status.setText(getString(R.string.move_app_position,draft.index()+1,draft.items().size()));
+            viewport.post(()->{if(overlay!=layer||viewport.getHeight()==0)return;int top=viewport.getPaddingTop()+px((draft.index()/6)*112);int height=viewport.getPaddingTop()+grid.getHeight()+viewport.getPaddingBottom();int target=FocusViewport.target(viewport.getScrollY(),viewport.getHeight(),height,top,top+px(104),px(6));viewport.scrollTo(0,target);});
+        }
+        void save(){if(saved||overlay!=layer)return;saved=true;prefs.edit().putString("order",String.join(",",draft.order())).apply();selectedPackage=selected.pkg;if(page.equals("home"))prefs.edit().putString("home_focus_encoded",encodeHomeFocus("app:"+selected.pkg)).apply();closeOverlay(false);showPage(page,true);}
     }
 
     /* ---------- Settings ---------- */

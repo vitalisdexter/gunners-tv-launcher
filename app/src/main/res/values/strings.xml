@@ -1,4 +1,9 @@
 <resources>
     <!-- Replaced at build time by LAUNCHER_GREETING or .local/greeting.txt (build.sh). -->
     <string name="greeting">Hello</string>
+    <string name="move_app_title">Move · %1$s</string>
+    <string name="move_app_home_hint">← → Rearrange Home apps     ·     OK Save     ·     Back Cancel</string>
+    <string name="move_app_grid_hint">← ↑ ↓ → Rearrange apps     ·     OK Save     ·     Back Cancel</string>
+    <string name="move_app_accessibility">Moving %1$s. Direction buttons rearrange. OK saves. Back cancels.</string>
+    <string name="move_app_position">Position %1$d of %2$d · Changes saved only with OK</string>
 </resources>

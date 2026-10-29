@@ -48,4 +48,11 @@ public class ContentFeedPolicyTest {
         assertEquals(50, ContentFeedPolicy.progress(50, 100));
         assertEquals(100, ContentFeedPolicy.progress(Long.MAX_VALUE, 100));
     }
+    @Test public void missingWatchTypeNeedsRealUnfinishedProgress(){
+        ContentFeedPolicy.Item progress=item("a","Legacy",1);progress.watchType=-1;progress.position=20;progress.duration=100;
+        assertEquals(1,ContentFeedPolicy.continuing(Arrays.asList(progress),6).size());
+        progress.position=0;assertTrue(ContentFeedPolicy.continuing(Arrays.asList(progress),6).isEmpty());
+        progress.position=100;assertTrue(ContentFeedPolicy.continuing(Arrays.asList(progress),6).isEmpty());
+        progress.position=20;progress.watchType=3;assertTrue(ContentFeedPolicy.continuing(Arrays.asList(progress),6).isEmpty());
+    }
 }

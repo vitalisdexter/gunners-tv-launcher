@@ -1,5 +1,17 @@
 # Local verification
 
+## 1.2.0 shared content and football News
+
+On 29 October 2026, local 	estReleaseUnitTest lintRelease assembleRelease assembleDebug passed: **118 tests, zero failures/errors; lint 0 errors/72 warnings**. Both APKs assembled as dev.gunnerstv.launcher, version 1.2.0/code 4, minimum API 26/target 34. Debug QA uses the same private local evaluation signer; release assembly is unsigned. GitHub Actions verifies the public source separately.
+
+The 21 added tests cover current-feed Home row visibility despite an empty startup cache, removal of stale cached rows, explicit hidden-row preservation, safe access/empty-table diagnostics, unfinished playback with a missing Watch Next type, YouTube IDs/URLs/channel identity, unsafe XML rejection, publish-date freshness rather than update time, deduplication/order, cache timing, and source gating to explicitly followed clubs. Starter creators never create football selections. No API key, account cookies, runtime library or permission was added.
+
+A read-only smoke test using the actual compiled Java feed reader verified all six starter channel identities and recent posts (AFTV 15, Blue Lions TV 3, City Xtra 3, The United Stand 15, The Anfield Wrap 15, WeAreTottenhamTV 15) on that date. Counts change naturally. Handle-page resolution encountered a regional non-feed redirect in this environment; UC-ID/RSS fetching succeeded. The editor explains its UC-channel fallback; consent/account flows are not automated. Synthetic parser tests cover matching/mismatching canonical and RSS identities. No raw feeds, user history or videos were committed.
+
+Lint counts: VectorRaster:1, DiscouragedApi:2, SetJavaScriptEnabled:1, DrawAllocation:11, UnusedResources:3, ViewConstructor:14, SetTextI18n:29, RtlHardcoded:11. The seven additional warnings comprise two programmatic-only view constructors and five English UI status-text findings. They are recorded, not suppressed. Existing categories/triage below still apply.
+
+Source review checked background requests, response/XML/image limits, channel identity, fixed YouTube video links, cache fallback and callback invalidation on source changes/detachment. Match refresh no longer detaches an active News panel. No emulator or TV was used. The user's positive Content sources counts establish readable titles, but the precise physical failure was not reproduced locally: current-feed composition and explicit row re-enabling address confirmed cache/visibility paths. DPAD reachability, on-TV rendering, source editing, actual video launch/Back and provider-specific resume still need the user's reinstall test. Missing private provider history cannot be remedied through public creator RSS.
+
 ## 1.1.0 football setup, focus and media sessions
 
 On 29 October 2026, local `testReleaseUnitTest lintRelease assembleRelease assembleDebug` passed: **97 tests, zero failures/errors; lint 0 errors/65 warnings**. Debug and unsigned release APKs assembled as `dev.gunnerstv.launcher`, version `1.1.0`/code `3`, minimum API 26/target 34. The debug signer remains the same private local QA identity; release assembly is unsigned. Hosted results are available in [GitHub Actions](https://github.com/vitalisdexter/gunners-tv-launcher/actions).

@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 final class WidgetBoard extends FrameLayout {
     static final float W=960,H=392,X=48,ROW_Y=190,ROW_H=186,ROW_W=864,GAP=16,DOTS_Y=380;
     /** Every widget, in the default order. */
-    static final String[] IDS={"football","youtube_resume","weather","netflix_resume","prime_resume","apple_resume",
+    static final String[] IDS={"football","content_status","youtube_resume","weather","netflix_resume","prime_resume","apple_resume",
             "youtube_picks","netflix_picks","prime_picks","apple_picks","youtube_music","spotify_picks",
             "arsenal","music","control","upnext","recommendations","inputs"};
     /** Widgets do their network and disk work here, away from the launcher's own loader (wallpapers, apps). */
@@ -36,9 +36,10 @@ final class WidgetBoard extends FrameLayout {
         void launch(String pkg);void start(Intent intent);
         SharedPreferences prefs();Activity activity();
     }
-    static String title(String id){FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return row.title;switch(id){case "football":return "Football fixtures";case "house":return "Smart Home";case "inputs":return "Inputs";case "upnext":return "Continue Watching";case "recommendations":return "Recommendations";case "arsenal":return "Live matches";case "weather":return "Weather";case "music":return "Now Playing";default:return "Control";}}
+    static String title(String id){if("content_status".equals(id))return "Streaming content status";FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return row.title;switch(id){case "football":return "Football fixtures";case "house":return "Smart Home";case "inputs":return "Inputs";case "upnext":return "Continue Watching";case "recommendations":return "Recommendations";case "arsenal":return "Live matches";case "weather":return "Weather";case "music":return "Now Playing";default:return "Control";}}
     static String glyph(String id){FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return row.music?"note":"tv";switch(id){case "house":return "home";case "inputs":return "hdmi";case "upnext":case "recommendations":return "tv";case "football":case "arsenal":return "play";case "weather":return "partly";case "music":return "note";default:return "gear";}}
     static String about(String id){if(FeedCatalog.row(id)!=null)return "Up to six app-shared titles. Hidden when the app publishes no matching content. Hold OK for more.";switch(id){
+        case "content_status":return "Access, refresh and provider diagnostics when shared content is unavailable.";
         case "football":return "Your chosen clubs and players · Fixtures, scores, lineups and goals. Configure in Football setup.";
         case "house":return "Scenes and your live 3D home, from House Control TV.";
         case "upnext":return "Six shared resume titles in an idle carousel. It pauses while you browse. Hold OK for all titles.";
@@ -48,15 +49,17 @@ final class WidgetBoard extends FrameLayout {
         case "music":return "What's playing on this TV, with play, pause and skip.";
         case "inputs":return "Your HDMI devices and live TV: switch to a console or a set-top box in one press.";
         default:return "Wi-Fi, audio output, Google Home and settings in one place.";}}
-    static float width(String id){if(FeedCatalog.row(id)!=null)return 864;switch(id){case "football":return 864;case "upnext":case "recommendations":return 864;case "weather":case "arsenal":return 424;case "inputs":return InputsWidget.widthFor(InputsWidget.count);default:return 424;}}
+    static float width(String id){if("content_status".equals(id))return 864;if(FeedCatalog.row(id)!=null)return 864;switch(id){case "football":return 864;case "upnext":case "recommendations":return 864;case "weather":case "arsenal":return 424;case "inputs":return InputsWidget.widthFor(InputsWidget.count);default:return 424;}}
     static float rowHeight(List<String> ids){for(String id:ids)if(FeedCatalog.row(id)!=null||id.equals("upnext")||id.equals("recommendations"))return 250;return ROW_H;}
     float totalHeight(){if(horizontal)return 212;float height=16;for(List<String> row:layout)height+=rowHeight(row)+24;return height;}
     static boolean utility(String id){return Arrays.asList("weather","arsenal","music","control").contains(id);}
     static ArrayList<ArrayList<String>> section(SharedPreferences prefs,boolean house,boolean inputs,boolean top){
         ArrayList<ArrayList<String>> result=new ArrayList<>();ArrayList<String> row=null;float used=0;
+        Set<String> shared=FeedCatalog.availableIds(FeedCatalog.latest,prefs.getStringSet("available_feeds",Collections.emptySet()));
         for(String id:order(prefs)){
             if(utility(id)!=top||!on(prefs,id)||id.equals("house"))continue;
-            if(FeedCatalog.row(id)!=null&&!prefs.getStringSet("available_feeds",Collections.emptySet()).contains(id))continue;
+            if(id.equals("content_status")&&!prefs.getBoolean("content_status_needed",true))continue;
+            if(FeedCatalog.row(id)!=null&&!shared.contains(id))continue;
             if(id.equals("inputs")&&!inputs)continue;float width=width(id);
             if(row==null||used+GAP+width>ROW_W){row=new ArrayList<>();result.add(row);used=width;}else used+=GAP+width;row.add(id);
         }
@@ -79,9 +82,11 @@ final class WidgetBoard extends FrameLayout {
      *  House Control TV and Inputs a TV with inputs; without them they are skipped. */
     static ArrayList<ArrayList<String>> pages(SharedPreferences prefs,boolean house,boolean inputs){
         ArrayList<ArrayList<String>> pages=new ArrayList<>();ArrayList<String> row=null;float used=0;
+        Set<String> shared=FeedCatalog.availableIds(FeedCatalog.latest,prefs.getStringSet("available_feeds",Collections.emptySet()));
         for(String id:order(prefs)){
             if(!on(prefs,id))continue;
-            if(FeedCatalog.row(id)!=null&&!prefs.getStringSet("available_feeds",Collections.emptySet()).contains(id))continue;
+            if(id.equals("content_status")&&!prefs.getBoolean("content_status_needed",true))continue;
+            if(FeedCatalog.row(id)!=null&&!shared.contains(id))continue;
             if(id.equals("inputs")&&!inputs)continue;
             if(id.equals("house")){if(!house)continue;pages.add(new ArrayList<>(Collections.singletonList(id)));row=null;continue;}
             float w=width(id);
@@ -128,6 +133,7 @@ final class WidgetBoard extends FrameLayout {
         Context c=getContext();
         FeedCatalog.Row row=FeedCatalog.row(id);if(row!=null)return new UpNextWidget(c,host,row);
         switch(id){
+            case "content_status":return new ContentSetupWidget(c,host);
             case "football":return new FootballWidget(c,host);
             case "upnext":return new UpNextWidget(c,host);
             case "weather":return new WeatherWidget(c,host);

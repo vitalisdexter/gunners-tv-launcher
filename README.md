@@ -2,7 +2,7 @@
 
 A football-focused home screen for Android TV and Google TV: your apps, fixtures, weather and music in one place.
 
-Version: **1.1.0 / 3**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
+Version: **1.2.0 / 4**. Android package: `dev.gunnerstv.launcher`. Minimum Android API: **26 (Android 8.0)**.
 
 ## Features
 
@@ -13,6 +13,7 @@ Version: **1.1.0 / 3**. Android package: `dev.gunnerstv.launcher`. Minimum Andro
 - Now Playing and shortcuts for Wi-Fi, audio output, Google Home and system settings, where the device supports them.
 - First-run and Settings football setup: choose a main club or none, search for your own clubs/players, and select club/international/both player fixtures. No personal list is preselected; provider coverage applies.
 - All-competition fixtures for chosen clubs, live-match priority, chosen-main-club fallback, and a match centre with overview, head-to-head results, lineups and provider commentary. Times use the TV's local time zone.
+- Football centre → News: recent public YouTube fan-channel videos for followed clubs, with club filters and editable creators. No YouTube account or paid API is needed. See [News sources](docs/NEWS-SOURCES.md).
 - Saved navigation position and Home-to-top behaviour.
 
 ## Install
@@ -46,7 +47,7 @@ This application has a new package identity and is a fresh setup, not an in-plac
 
 Content comes only from Android TV records that installed apps publish. Netflix/YouTube/Prime/Apple TV may expose recommendations without resumable titles, or nothing. YouTube Continue Watching is supported by the launcher but depends on YouTube publishing suitable records; the launcher cannot retrieve YouTube watch history. Exact resume is controlled by each provider. Music rows do not access Spotify history or promise Premium features. Now Playing needs a provider media session; the launcher cannot force YouTube/other apps to keep playing after Home. See [Now Playing setup](CONFIGURATION.md#now-playing). Football endpoints are undocumented public ESPN endpoints with incomplete/delayed coverage and no service guarantee; setup supports up to 12 clubs/8 players, with no search account/key. Future player participation is tentative until a lineup/appearance is reported. Weather uses Open-Meteo; its service terms apply independently of this code licence.
 
-The proposed YouTube football News tab is not part of this version. Planned features are not represented as installed.
+If Content sources lists titles but Home is missing their rows, use Settings → Content sources → Refresh, then Show shared rows on Home. The report identifies rows hidden by the Home settings and distinguishes access problems from unpublished content. Existing visibility choices are retained until you explicitly enable them. Empty feeds show a setup/status card when supported apps are installed, rather than silently hiding the access route.
 
 No private app databases, account passwords, playlist credentials or analytics are collected. See [PRIVACY.md](PRIVACY.md). Runtime club/provider logos are their owners’ marks, not a claim of endorsement. This project is not affiliated with Arsenal, any league, provider or TV manufacturer.
 

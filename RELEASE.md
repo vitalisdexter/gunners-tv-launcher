@@ -1,8 +1,10 @@
 # Release preparation
 
-Current source version: **1.1.0 / versionCode 3**. Fixes widget-editor focus/scrolling, improves media-session detection/control capabilities and adds first-run/on-TV football choices without compiled personal presets. The optional Buy Me a Coffee link from 1.0.1 remains. No new runtime library or permission. Earlier preparation notes remain below for provenance.
+Current source version: **1.2.0 / versionCode 4**. Fixes stale Home content-row composition and listings refresh/access handling, adds safe Content sources diagnostics and an explicit Show shared rows on Home action, and implements Football centre → News with editable public YouTube fan channels. Existing football selections and row choices persist. No new runtime library or permission.
 
-Draft description: Six favourites and installed-app discovery, clock/greeting, utility widgets, weather/forecast, Now Playing, Wi-Fi/audio/Google Home shortcuts, and app-published content. Vertical content rows with visibility switches and restored focus; on-TV club/player/main-club setup, all-competition fixtures, live priority/chosen-main-club fallback, match centre with H2H, lineups and provider commentary.
+Draft description: Six favourites and installed-app discovery, clock/greeting, utility widgets, weather/forecast, Now Playing, Wi-Fi/audio/Google Home shortcuts, and app-published content. Vertical content rows with visibility switches and restored focus; on-TV club/player/main-club setup, all-competition fixtures, live priority/chosen-main-club fallback, match centre with H2H, lineups, provider commentary and recent creator videos.
+
+Draft 1.2.0 release notes: Refresh/readable-title visibility fixes, reachable shared-content setup, clearer hidden/access/empty feed status, and club-filtered YouTube football News. Starter creators apply only to explicitly followed clubs and can be edited/removed. News is public recent uploads, not personalized history. Use the same existing signer for an update; a mismatch is not a reason to uninstall or clear data. Physical TV navigation, exact resume and video launch/return remain to be verified after reinstall.
 
 Draft release: Gunner's TV Launcher 1.0.0 — independently buildable public preparation. Personal defaults removed; independent build and recovery documentation; required component licences retained. New package, original cannon-inspired icon/banner, neutral About/licences, validated weather configuration and bounded network/artwork handling.
 

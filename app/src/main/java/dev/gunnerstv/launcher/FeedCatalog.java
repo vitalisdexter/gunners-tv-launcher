@@ -37,5 +37,6 @@ final class FeedCatalog {
     static Set<String> available(ContentFeedReader.Result result){
         Set<String> ids=new HashSet<>();for(Row row:ROWS)if(!row.select(result).isEmpty())ids.add(row.id);return ids;
     }
+    static Set<String> availableIds(ContentFeedReader.Result current,Set<String> cached){return current==null?new HashSet<>(cached):available(current);}
     static volatile ContentFeedReader.Result latest;
 }

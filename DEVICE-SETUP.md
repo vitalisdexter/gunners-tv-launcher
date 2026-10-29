@@ -107,6 +107,10 @@ Grant TV listings access only if offered and wanted for shared content. Now Play
 
 Rows appear only when supported apps publish suitable records. A signed-in YouTube app does not guarantee a Continue Watching feed. Do not treat an empty provider row as proof of failed installation.
 
+In 1.2.0+, use Settings → Content sources → Refresh to read current feeds. Grant listings access only if the normal prompt is offered and wanted. When the report lists titles but rows are absent on Home, inspect its hidden-row markers and choose Show shared rows on Home, then scroll below the favourite apps. Report access/table counts separately from positive title counts; private Google TV/provider histories are not available through this route.
+
+For Football News in 1.2.0+, open a fixture → News. Check recent videos for followed clubs, a club filter, and a real YouTube video launch/Back return. Creators can be edited in that tab or Settings → Football News creators. Starter fan channels only apply to clubs already chosen in Football setup. Empty or failed public feeds must not be reported as a successful playback test. See [News sources](docs/NEWS-SOURCES.md).
+
 Now Playing requires a live/controllable media session, even with notification access enabled. YouTube Music may be handled by YouTube on TV; if that app stops playback or removes its session on Home, the launcher cannot supply background play. Music help explains this distinction. Test access, session visibility and control capabilities separately.
 
 ## 6. Choose Home, if wanted

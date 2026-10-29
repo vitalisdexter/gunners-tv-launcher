@@ -49,7 +49,8 @@ final class ContentFeedPolicy {
         List<Item> result = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         for (Item item : sorted) {
-            if ((item.watchType != 0 && item.watchType != 1) || item.title.isEmpty()
+            boolean legacyProgress=item.watchType==-1&&item.position>0&&item.duration>item.position;
+            if ((item.watchType != 0 && item.watchType != 1&&!legacyProgress) || item.title.isEmpty()
                     || item.intent.isEmpty() || !seen.add(item.key())) continue;
             result.add(item);
             if (result.size() == maximum) break;

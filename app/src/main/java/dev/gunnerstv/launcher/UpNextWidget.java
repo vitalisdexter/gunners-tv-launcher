@@ -104,8 +104,9 @@ final class UpNextWidget extends Widget {
     }
 
     private ArrayList<Item> load(Context context,ContentFeedReader.Result result){
-        if(context.checkSelfPermission(LISTINGS)!=PackageManager.PERMISSION_GRANTED){ArrayList<Item> allow=new ArrayList<>();Item i=new Item();i.allow=true;i.key="allow";i.title="Allow shared TV listings";i.line="Continue Watching & recommendations";i.detail="Read titles your streaming apps share with Android TV.";allow.add(i);return allow;}
-        return feedItems(feedRow==null?(recommendations?result.recommendations:result.continuing):feedRow.select(result));
+        java.util.List<ContentFeedPolicy.Item> shared=feedRow==null?(recommendations?result.recommendations:result.continuing):feedRow.select(result);
+        if(shared.isEmpty()&&!result.status.listingsGranted){ArrayList<Item> allow=new ArrayList<>();Item i=new Item();i.allow=true;i.key="allow";i.title="Allow shared TV listings";i.line="Continue Watching & recommendations";i.detail="Read titles your streaming apps share with Android TV.";allow.add(i);return allow;}
+        return feedItems(shared);
     }
     private ArrayList<Item> feedItems(java.util.List<ContentFeedPolicy.Item> source){
         ArrayList<Item> out=new ArrayList<>();
@@ -231,9 +232,7 @@ final class UpNextWidget extends Widget {
     }
     private void open(Item item){
         if(item.allow){
-            android.app.Activity a=host.activity();
-            if(a.shouldShowRequestPermissionRationale(LISTINGS)||!host.prefs().getBoolean("asked_listings",false)){host.prefs().edit().putBoolean("asked_listings",true).apply();a.requestPermissions(new String[]{LISTINGS},7);}
-            else host.start(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+a.getPackageName())));
+            ((MainActivity)host.activity()).requestContentAccess();
             return;
         }
         if(item.intent!=null){

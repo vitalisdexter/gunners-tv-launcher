@@ -82,7 +82,7 @@ public final class MainActivity extends Activity {
             syncHouse();
         }
     };
-    private boolean loaded, loading, started, homeGreeting=true;
+    private boolean loaded, loading, started, homeGreeting=true,discoverAgain;
     private float unit = 1f;
     private int lastDirectionX=1, lastDirectionY=0;
     private String heroPackage="";
@@ -105,6 +105,7 @@ public final class MainActivity extends Activity {
     };
     private String[] FIRST;
     private FootballSetup footballEditor;
+    private AlertDialog contentDialog;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -166,7 +167,7 @@ public final class MainActivity extends Activity {
         wallpaper.pauseAmbient();wallpaper.rest();
     }
     @Override public void onWindowFocusChanged(boolean focused) { super.onWindowFocusChanged(focused);if(wallpaper!=null)wallpaper.syncAmbient(); }
-    @Override protected void onDestroy() { if(footballEditor!=null)footballEditor.close();MatchCentre.dismissFor(this); getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
+    @Override protected void onDestroy() { NewsSourcesEditor.dismissFor(this);if(contentDialog!=null)contentDialog.dismiss();if(footballEditor!=null)footballEditor.close();MatchCentre.dismissFor(this); getContentResolver().unregisterContentObserver(feedObserver);try{unregisterReceiver(packages);}catch(IllegalArgumentException ignored){} if(wallpaper!=null){wallpaper.pauseAmbient();wallpaper.surfaceThread.quitSafely();}if(forecastClock!=null)forecastClock.close(); super.onDestroy(); handler.removeCallbacksAndMessages(null); loader.shutdownNow(); if(sonic!=null)sonic.release(); }
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if(intent.getBooleanExtra("personal.resume_home",false))prefs.edit().putBoolean("redirect_home",true).apply();
@@ -187,6 +188,7 @@ public final class MainActivity extends Activity {
     }
     @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] results){
         super.onRequestPermissionsResult(code,permissions,results);
+        if(code==7){FeedCatalog.latest=null;discover();return;}
         if(board!=null)board.refresh();
         if(topBoard!=null)topBoard.refresh();
     }
@@ -313,7 +315,7 @@ public final class MainActivity extends Activity {
     }
 
     private void discover() {
-        if (loading) return;
+        if (loading) {discoverAgain=true;return;}
         loading=true;
         loader.execute(() -> {
             ArrayList<App> found = new ArrayList<>();
@@ -343,16 +345,22 @@ public final class MainActivity extends Activity {
             Collections.sort(found, (a,b)->a.label.compareToIgnoreCase(b.label));
             ContentFeedReader.Result feed=new ContentFeedReader(getApplicationContext()).read();
             Set<String> available=FeedCatalog.available(feed);
+            boolean supported=false;for(App app:found)if(ContentFeedPolicy.supported(app.pkg)){supported=true;break;}
+            final boolean statusNeeded=feed.status.needsSetup(supported,!available.isEmpty());
             runOnUiThread(() -> {
                 if (isDestroyed()) return;
                 loading=false;
                 boolean changed = !loaded || found.size()!=apps.size();
                 changed|=!available.equals(prefs.getStringSet("available_feeds",Collections.emptySet()));
+                changed|=statusNeeded!=prefs.getBoolean("content_status_needed",true);
                 FeedCatalog.latest=feed;
-                prefs.edit().putStringSet("available_feeds",available).apply();
+                prefs.edit().putStringSet("available_feeds",available).putBoolean("content_status_needed",statusNeeded).apply();
+                if(page.equals("home")){ArrayList<ArrayList<String>> desired=WidgetBoard.section(prefs,house,!InputsWidget.list(this).isEmpty(),false);changed|=board==null?!desired.isEmpty():!board.layout.equals(desired);}
                 if (!changed) for (int i=0;i<found.size();i++) if (!found.get(i).pkg.equals(apps.get(i).pkg)) { changed=true; break; }
                 if (changed) { apps.clear(); apps.addAll(found); HashMap<String,App> index=new HashMap<>(); for(App a:found) index.put(a.pkg,a); appIndex=index; loaded=true; showPage(page, true); }
                 else {if(board!=null)board.refresh();if(topBoard!=null)topBoard.refresh();}
+                if(contentDialog!=null&&contentDialog.isShowing())contentDialog.setMessage(contentReport());
+                if(discoverAgain){discoverAgain=false;handler.post(this::discover);}
             });
         });
     }
@@ -975,6 +983,7 @@ public final class MainActivity extends Activity {
         footballRow=controls.size();
         controls.add(option(list,"Football setup",()->FootballSettings.load(this).summary(),null,()->footballSetup(false),
             ()->preview(0,"Your football","Choose your main club, followed clubs and players. No personal preset or source edit is required.")));
+        newsSourcesRow=controls.size();controls.add(option(list,"Football News creators",()->FootballNewsSources.list(this).size()+" sources",null,()->NewsSourcesEditor.open(this,unit,()->{if(page.equals("settings")){showPage("settings",false);controlsFocus(newsSourcesRow);}}),()->preview(0,"Football News","Choose public YouTube creators for your followed clubs. Recent videos appear in the football centre's News tab.")));
         if(house)controls.add(option(list,"Scene apps",()->"Choose",null,this::sceneApps,()->preview(0,"Scene apps","Open an app after a scene — Movie can start Netflix as the lights go down.")));
         controls.add(option(list,"Home screen",()->launcherIsHome()?"Gunner's":"TV default",null,this::homeScreen,
             ()->preview(0,"Home screen",launcherIsHome()?"Gunner's opens when you press Home. Choose to return to your TV's own home screen.":"Your TV's own home screen opens when you press Home.")));
@@ -982,7 +991,7 @@ public final class MainActivity extends Activity {
         controls.add(option(list,"Device settings",()->"",null,()->startActivity(new Intent(Settings.ACTION_SETTINGS)),()->preview(0,"Device settings","Network, picture, sound and accounts.")));
         controls.add(option(list,"About Gunner's",()->"",null,this::aboutScreen,()->preview(0,"About Gunner's","Version "+version()+" · Open-source components")));
         controls.add(option(list,getString(R.string.support_title),()->"",null,this::supportScreen,()->preview(0,getString(R.string.support_title),getString(R.string.support_preview))));
-        controls.add(option(list,"Content sources",()->"Status",null,this::feedStatus,()->preview(0,"Content sources","See which apps are sharing recommendations and resume titles. Empty feeds stay hidden.")));
+        contentSourcesRow=controls.size();controls.add(option(list,"Content sources",()->"Status",null,this::feedStatus,()->preview(0,"Content sources","See which apps are sharing recommendations and resume titles. Empty feeds stay hidden.")));
         content.setTag(controls);
         preview(THUMBS[wp],WALLPAPERS[wp],"Eight wallpapers, from silver silk to the Milky Way. Silver is light by day and dark after sunset.");
         if (focus) root.post(()->controls.get(0).requestFocus());
@@ -1004,14 +1013,33 @@ public final class MainActivity extends Activity {
         new AlertDialog.Builder(this).setTitle("Recommendation rows").setMultiChoiceItems(labels,checked,(dialog,which,on)->{String id=choices.get(which).id;if(on)off.remove(id);else off.add(id);prefs.edit().putString("widget_off",String.join(",",off)).apply();})
             .setPositiveButton("Done",null).show();
     }
-    private void feedStatus(){
+    private void feedStatus(){contentSources();}
+    void contentSources(){
+        if(contentDialog!=null&&contentDialog.isShowing()){contentDialog.setMessage(contentReport());return;}
+        AlertDialog.Builder builder=new AlertDialog.Builder(this).setTitle("Content sources").setMessage(contentReport()).setPositiveButton("Done",null).setNeutralButton("Refresh",null);
+        android.widget.Button reveal=new android.widget.Button(this);reveal.setText("Show shared rows on Home");reveal.setOnClickListener(v->{ContentFeedReader.Result current=FeedCatalog.latest;if(current==null){discover();return;}Set<String> ids=FeedCatalog.available(current);if(ids.isEmpty()){Toast.makeText(this,"No readable shared titles are available yet.",Toast.LENGTH_LONG).show();return;}Set<String> off=new HashSet<>(Arrays.asList(prefs.getString("widget_off","").split(",")));off.removeAll(ids);prefs.edit().putString("widget_off",String.join(",",off)).apply();showPage(page,false);if(contentDialog!=null)contentDialog.setMessage(contentReport());Toast.makeText(this,"Available shared rows enabled on Home.",Toast.LENGTH_SHORT).show();});builder.setView(reveal);
+        if(checkSelfPermission(UpNextWidget.LISTINGS)!=PackageManager.PERMISSION_GRANTED)builder.setNegativeButton("Allow TV listings",(d,w)->requestContentAccess());
+        AlertDialog dialog=builder.create();contentDialog=dialog;
+        dialog.setOnDismissListener(d->{if(contentDialog==dialog)contentDialog=null;if(started&&!isFinishing()){if(page.equals("settings"))controlsFocus(contentSourcesRow);else requestHomeRestore();}});
+        dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v->{dialog.setMessage("Refreshing shared TV content…");FeedCatalog.latest=null;discover();}));dialog.show();
+    }
+    void requestContentAccess(){
+        String permission=UpNextWidget.LISTINGS;
+        if(checkSelfPermission(permission)==PackageManager.PERMISSION_GRANTED){FeedCatalog.latest=null;discover();return;}
+        try{PermissionInfo info=getPackageManager().getPermissionInfo(permission,0);if((info.protectionLevel&PermissionInfo.PROTECTION_MASK_BASE)!=PermissionInfo.PROTECTION_DANGEROUS){Toast.makeText(this,"This firmware does not offer a user-grantable listings permission. Check Content sources for accessible data.",Toast.LENGTH_LONG).show();return;}}
+        catch(PackageManager.NameNotFoundException missing){Toast.makeText(this,"TV listings access is not exposed by this firmware.",Toast.LENGTH_LONG).show();return;}
+        if(shouldShowRequestPermissionRationale(permission)||!prefs.getBoolean("asked_listings",false)){prefs.edit().putBoolean("asked_listings",true).apply();requestPermissions(new String[]{permission},7);}
+        else startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName())));
+    }
+    private String contentReport(){
         StringBuilder body=new StringBuilder();ContentFeedReader.Result feed=FeedCatalog.latest;
-        for(FeedCatalog.Row row:FeedCatalog.ROWS){int count=feed==null?0:row.select(feed).size();body.append(row.title).append(": ").append(count==0?"not currently shared":count+" titles shared").append("\n");}
+        body.append(feed==null?"Shared content has not been refreshed yet.":feed.status.message()+"\n\n"+feed.status.counts()).append("\n\n");
+        for(FeedCatalog.Row row:FeedCatalog.ROWS){int count=feed==null?0:row.select(feed).size();body.append(row.title).append(": ").append(count==0?"not currently shared":count+" titles shared").append(WidgetBoard.on(prefs,row.id)?"":" · Hidden in Home widgets").append("\n");}
         body.append("\nMusic uses recommendations shared by the TV apps. No Spotify Premium or account connection is needed for shared cards. YouTube watch history is not exposed. Now Playing requires an active media session; some TV apps stop playback on Home.\n\nFootball: ESPN public feed. Choose clubs, players and a main club in Football setup. All supplied competitions are included; player participation stays pending until lineups are confirmed. The live widget falls back only to your selected main club.");
         if(feed!=null&&!feed.error.isEmpty())body.append("\n\n").append(feed.error);
-        new AlertDialog.Builder(this).setTitle("Content sources").setMessage(body.toString()).setPositiveButton("Done",null).show();
+        body.append("\n\nOnly searchable app-shared records can be shown. Google TV's private recommendations and provider account history are not accessible through these tables.");return body.toString();
     }
-    private ScrollView settingsScroll;private ValueAnimator settingsGlide;private int widgetsRow,footballRow;
+    private ScrollView settingsScroll;private ValueAnimator settingsGlide;private int widgetsRow,footballRow,newsSourcesRow,contentSourcesRow;
     /** Scrolls the settings list so the focused row, with room for its lift and shadow (and its group's caption
      *  above the first row of a group), clears the faded edges. */
     private void reveal(View row){

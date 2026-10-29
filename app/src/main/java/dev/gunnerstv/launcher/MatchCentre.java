@@ -9,16 +9,17 @@ import android.widget.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/** A TV matchday dashboard: real data, four browsable sections and stable remote focus. */
+/** A TV matchday dashboard with match data and recent YouTube creator videos. */
 final class MatchCentre extends Dialog {
     private static final int WHITE=0xFFF4F5F7,MUTED=0xFF9DAAB7,MINT=0xFFA9E6CA;
-    private static final String[] TITLES={"Overview","Head to head","Lineups","Commentary"};
+    private static final String[] TITLES={"Overview","Head to head","Lineups","Commentary","News"};
     private static java.lang.ref.WeakReference<MatchCentre> current=new java.lang.ref.WeakReference<>(null);
     private final WidgetBoard.Host host;
     private final ArsenalMatch match;
     private final Handler timer=new Handler(Looper.getMainLooper());
     private final ArrayList<TextView> tabs=new ArrayList<>();
-    private final int[] positions=new int[4];
+    private final int[] positions=new int[TITLES.length];
+    private FootballNewsPanel news;
     private final int homeAccent,awayAccent;
     private FrameLayout hero;
     private LinearLayout body;
@@ -77,7 +78,7 @@ final class MatchCentre extends Dialog {
         top.addView(button("‹  Fixtures",this::dismiss),pos(100,34,0,0));
         TextView kicker=label("M A T C H D A Y",10,MINT);top.addView(kicker,pos(230,15,120,0));
         top.addView(label("Football centre",20,WHITE),pos(400,26,119,14));
-        refreshButton=button("↻  Refresh",this::refresh);top.addView(refreshButton,pos(108,34,756,0));
+        refreshButton=button("↻  Refresh",()->{if(tab==4&&news!=null)news.refresh(true);else refresh();});top.addView(refreshButton,pos(108,34,756,0));
         column.addView(top,new LinearLayout.LayoutParams(-1,px(40)));
         hero=new FrameLayout(getContext());hero.setClipToOutline(true);hero.setBackground(panel(0xFF24323D,0xFF171F2B,22));
         LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,px(148));hp.topMargin=px(10);column.addView(hero,hp);
@@ -89,7 +90,7 @@ final class MatchCentre extends Dialog {
             b.setOnKeyListener((v,key,event)->{
                 if(event.getAction()!=KeyEvent.ACTION_DOWN)return false;
                 if(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT){
-                    int next=Math.max(0,Math.min(3,target+(key==KeyEvent.KEYCODE_DPAD_RIGHT?1:-1)));tabs.get(next).requestFocus();return true;
+                    int next=Math.max(0,Math.min(TITLES.length-1,target+(key==KeyEvent.KEYCODE_DPAD_RIGHT?1:-1)));tabs.get(next).requestFocus();return true;
                 }
                 return false;
             });
@@ -122,10 +123,11 @@ final class MatchCentre extends Dialog {
         hero.addView(centered(match.home,19,WHITE),pos(274,27,15,108));hero.addView(centered(match.away,19,WHITE),pos(274,27,575,108));
         TextView result=centered("pre".equals(match.state)?time(match.kickoff,"HH:mm"):match.score(),51,WHITE);result.setTypeface(Typeface.create("sans-serif-light",Typeface.NORMAL));hero.addView(result,pos(310,65,277,35));
         TextView status=centered(state(),10.5f,match.live()?MINT:0xDDE4ECF0);status.setBackground(round(match.live()?0x285EDBA7:0x16FFFFFF,12));hero.addView(status,pos(310,25,277,107));
-        renderBody(true);paintTabs();stamp.setText(error.isEmpty()?"ESPN  ·  "+(match.updated>0?"Updated "+time(match.updated,"HH:mm"):"Awaiting details")+"   /   TV local time     ·     ← → Switch tabs     ·     ↓ Explore     ·     Back to fixtures":error);
+        renderBody(true);paintTabs();updateStamp();
     }
+    private void updateStamp(){stamp.setText(tab==4?"YouTube · Public creator videos · Latest seven days · Back to fixtures":error.isEmpty()?"ESPN  ·  "+(match.updated>0?"Updated "+time(match.updated,"HH:mm"):"Awaiting details")+"   /   TV local time     ·     ← → Switch tabs     ·     ↓ Explore     ·     Back to fixtures":error);}
     private void select(int target,boolean animate){
-        if(body==null||target==tab){paintTabs();return;}positions[tab]=scroll.getScrollY();tab=target;renderBody(false);paintTabs();
+        if(body==null||target==tab){paintTabs();return;}positions[tab]=scroll.getScrollY();tab=target;renderBody(false);paintTabs();updateStamp();
         if(animate&&host.motion()){body.animate().cancel();body.setAlpha(.45f);body.setTranslationY(px(5));body.animate().alpha(1).translationY(0).setDuration(200).start();}
     }
     private void openTab(int target){tabs.get(target).requestFocus();select(target,true);}
@@ -157,8 +159,9 @@ final class MatchCentre extends Dialog {
         FrameLayout c=card(tag,110,action);title(c,headline.toUpperCase(Locale.UK));TextView t=text(explanation,14,MUTED);t.setLineSpacing(px(3),1);c.addView(t,pos(760,54,18,42));addFull(c,110);
     }
     private void renderBody(boolean preserve){
+        if(tab==4&&news!=null&&news.getParent()==body)return;
         if(body==null)return;int y=scroll.getScrollY();View focused=body.findFocus();Object key=focused==null?null:focused.getTag();body.removeAllViews();MatchDetail d=match.detail;
-        if(tab==0)overview(d);else if(tab==1)history(d);else if(tab==2)lineups(d);else commentary(d);
+        if(tab==4){if(news==null)news=new FootballNewsPanel(host);body.addView(news,new LinearLayout.LayoutParams(-1,-2));}else if(tab==0)overview(d);else if(tab==1)history(d);else if(tab==2)lineups(d);else commentary(d);
         if(preserve&&key!=null){View target=body.findViewWithTag(key);if(target!=null)target.requestFocus();}
         int target=preserve?y:positions[tab];scroll.post(()->scroll.scrollTo(0,target));
     }
@@ -167,7 +170,7 @@ final class MatchCentre extends Dialog {
         FrameLayout info=card("overview:info",118,null);title(info,"MATCH INFORMATION");
         TextView venue=text(d!=null&&!d.venue.isEmpty()?d.venue:"Venue to be confirmed",18,WHITE);venue.setMaxLines(1);venue.setEllipsize(android.text.TextUtils.TruncateAt.END);info.addView(venue,pos(380,27,16,38));
         info.addView(label(d!=null&&!d.location.isEmpty()?d.location:match.league,12,MUTED),pos(380,18,16,69));
-        info.addView(label(d!=null&&!d.referee.isEmpty()?"Referee · "+d.referee:"UK kickoff · "+time(match.kickoff,"EEE d MMM, HH:mm"),11,0xCCD9E3E8),pos(380,18,16,93));
+        info.addView(label(d!=null&&!d.referee.isEmpty()?"Referee · "+d.referee:"Local kickoff · "+time(match.kickoff,"EEE d MMM, HH:mm"),11,0xCCD9E3E8),pos(380,18,16,93));
         FrameLayout form=card("overview:form",118,()->openTab(1));title(form,"RECENT FORM");
         formRow(form,match.home,d==null?"":d.homeForm,39);formRow(form,match.away,d==null?"":d.awayForm,76);addPair(info,form,118);
         FrameLayout meeting=card("overview:meeting",97,()->openTab(1));title(meeting,"HEAD TO HEAD   ›");

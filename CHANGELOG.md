@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — shared content visibility and football News
+
+- Home row composition now uses the current readable feed rather than an obsolete availability cache, and discovery rebuilds a mismatched Home layout. Explicit per-row visibility preferences remain respected.
+- Content sources now offers Refresh and Show shared rows on Home, identifies hidden rows, and reports safe access/table counts. Empty feeds retain a reachable setup/status card when supported apps are installed. Listings permission results trigger a fresh provider read; public rows are no longer blocked solely by an absent permission when actually readable.
+- Added the football centre's News tab, club filters, bounded video cards and editable public YouTube fan-channel sources. Starter creators apply only to already-followed clubs. Recent videos use public channel RSS, seven-day freshness, caching and actual YouTube links; no account history is fabricated.
+- Added regressions for real-feed Home visibility, access diagnostics, genuine unfinished progress with missing Watch Next type, channel/feed validation, publication freshness, cache timing and followed-club source selection. No new runtime library or permission. No TV installation is part of this update.
+
 ## 1.1.0 — football setup and remote navigation fixes
 
 - Bounded the Home widgets editor with a scrolling viewport and focus margins, including row reorder and motion-off handling, so selection stays on screen.
